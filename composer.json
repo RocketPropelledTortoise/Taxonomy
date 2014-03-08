@@ -1,0 +1,24 @@
+{
+    "name": "rocket/taxonomy",
+    "description": "",
+    "authors": [
+        {
+            "name": "Stéphane Goetz",
+            "email": "onigoetz@onigoetz.ch"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+		"illuminate/support": "4.1.*"
+    },
+    "autoload": {
+        "classmap": [ "migrations" ],
+        "psr-4": { "Rocket\\Taxnomy\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}
