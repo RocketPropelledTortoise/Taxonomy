@@ -21,10 +21,10 @@ use I18N;
  *     echo $term;
  *     -> will output the term in the current language
  *
- *     $term->text()
+ *     $term->title()
  *     -> will return the term in the current language
  *
- *     $term->text('en')
+ *     $term->title('en')
  *     -> will output the term in English
  *
  *     $term->translated()
@@ -65,7 +65,7 @@ class Term implements ArrayAccess
      */
     public function __toString()
     {
-        return $this->text();
+        return $this->title();
     }
 
     /**
@@ -90,23 +90,49 @@ class Term implements ArrayAccess
     }
 
     /**
+     * @deprecated
+     * @param string $language
+     */
+    public function text($language = '')
+    {
+        \Log::warning('deprectated $text');
+        return $this->string('title', $language);
+    }
+
+    /**
+     * @param string $language
+     */
+    public function title($language = '')
+    {
+        return $this->string('title', $language);
+    }
+
+    /**
+     * @param string $language
+     */
+    public function description($language = '')
+    {
+        return $this->string('description', $language);
+    }
+
+    /**
      * Return the textual version of the term
      *
      * @param  string $language
      * @return string
      */
-    public function text($language = '')
+    public function string($key, $language = '')
     {
         if (!$this->container['has_translations']) {
-            return $this->container['lang']['text'];
-        } else {
-            if ($language == '') {
-                $language = I18N::getCurrent();
-            }
+            return $this->container['lang'][$key];
+        }
 
-            if (array_key_exists('lang_' . $language, $this->container)) {
-                return $this->container['lang_' . $language]['text'];
-            }
+        if ($language == '') {
+            $language = I18N::getCurrent();
+        }
+
+        if (array_key_exists('lang_' . $language, $this->container)) {
+            return $this->container['lang_' . $language][$key];
         }
 
         return '';
@@ -114,12 +140,12 @@ class Term implements ArrayAccess
 
     public function isSubcategory()
     {
-        return (bool) $this->container['subcat'];
+        return $this->container['type'] == 1;
     }
 
-    public function getParent()
+    public function getType()
     {
-        return (int) $this->container['parent_id'];
+        return $this->container['type'];
     }
 
     /**
@@ -189,20 +215,23 @@ class Term implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        if ($offset == 'text' || $offset == 'translated') {
-
-            if (!$this->container['has_translations']) {
-                return $this->container['lang'][$offset];
-            }
-
-            if (!array_key_exists('lang_' . I18N::getCurrent(), $this->container)) {
-                var_dump($this);
-            }
-
-            return $this->container['lang_' . I18N::getCurrent()][$offset];
-
+        if (!in_array($offset, ['title', 'description', 'text', 'translated'])) {
+            return isset($this->container[$offset]) ? $this->container[$offset] : null;
         }
 
-        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+        if ($offset == 'text') {
+            $offset = 'title';
+            \Log::warning('text is deprecated implemented');
+        }
+
+        if (!$this->container['has_translations']) {
+            return $this->container['lang'][$offset];
+        }
+
+        if (array_key_exists('lang_' . I18N::getCurrent(), $this->container)) {
+            return $this->container['lang_' . I18N::getCurrent()][$offset];
+        }
+
+        return null;
     }
 }
