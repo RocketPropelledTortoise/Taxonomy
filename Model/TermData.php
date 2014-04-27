@@ -25,6 +25,6 @@ class TermData extends \Eloquent {
      */
     public function term()
     {
-        return $this->belongsTo('Rocket\Taxonomy\Model\Term', 'term_id');
+        return $this->belongsTo('Rocket\Taxonomy\Model\TermContainer', 'term_id');
     }
 }

@@ -115,6 +115,22 @@ class Term implements ArrayAccess
         return $this->string('description', $language);
     }
 
+    public function renderPaths()
+    {
+        $paths = \Taxonomy::getPaths($this->container['term_id']);
+
+        $strings = [];
+        foreach ($paths as $path) {
+            $string = [];
+            foreach($path as $id) {
+                $string[] = \Taxonomy::getTerm($id)->text();
+            }
+            $strings[] = implode(' <small>&#8594;</small> ', $string);
+        }
+
+        return implode('<br />', $strings);
+    }
+
     /**
      * Return the textual version of the term
      *

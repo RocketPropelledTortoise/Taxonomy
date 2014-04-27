@@ -6,10 +6,12 @@
 
 namespace Rocket\Taxonomy;
 
-use Rocket\Taxonomy\Model\Term as TermModel;
+use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermContent;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Model\Vocabulary;
+use Rocket\Taxonomy\Repositories\TermRepositoryInterface;
+use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface;
 use I18N;
 
 /**
@@ -38,13 +40,28 @@ class Taxonomy
      */
     protected $vocabularyByName = [];
 
+    /**
+     * @var \Illuminate\Cache\Repository
+     */
     protected $cache;
+
+    /**
+     * @var TermRepositoryInterface
+     */
+    protected $termRepository;
+
+    /**
+     * @var TermHierarchyRepositoryInterface
+     */
+    protected $termHierarchyRepository;
 
     /**
      * Initialize the taxonomy, Loads all existing taxonomies
      */
-    public function __construct($cache)
+    public function __construct(\Illuminate\Cache\CacheManager $cache, TermRepositoryInterface $termRepository, TermHierarchyRepositoryInterface $termHierarchyRepository)
     {
+        $this->termRepository = $termRepository;
+        $this->termHierarchyRepository = $termHierarchyRepository;
         $this->cache = $cache;
 
         //get the list of taxonomies
@@ -118,100 +135,19 @@ class Taxonomy
     }
 
     /**
-     * Puts the term in the cache and returns it for usage
-     * @param  integer $term_id
-     * @return array
-     */
-    public function cacheTerm($term_id)
-    {
-        $term_table = (new TermModel)->getTable();
-        $data_table = (new TermData)->getTable();
-
-        $translations = TermModel::where($term_table . '.id', $term_id)
-            ->select('term_id', 'vocabulary_id', $data_table . '.id', 'language_id', 'title', 'description')
-            ->join($data_table, $term_table . '.id', '=', $data_table . '.term_id')
-            ->get();
-
-        if (!count($translations)) {
-            return false;
-        }
-
-        $term = array();
-        foreach ($translations as $t) {
-            $term[$t->language_id] = $t;
-        }
-
-        $first = current($term);
-
-        $final_term = new Term(
-            array(
-                'word_id' => $first->id,
-                'term_id' => $first->term_id,
-                'parent_id' => $first->parent_id,
-                'vocabulary_id' => $first->vocabulary_id,
-                'content_id' => $first->content_id,
-                'weight' => $first->weight,
-                'type' => (bool)$first->type,
-            )
-        );
-
-        if ($this->isTranslatable($first->vocabulary_id)) {
-            foreach (I18N::languages() as $lang => $l) {
-                if (array_key_exists($l['id'], $term)) {
-                    $d = $term[$l['id']];
-                } else {
-                    $d = $first;
-                }
-
-                $final_term['lang_' . $lang] = array(
-                    'translated' => ($l['id'] == $d->language_id) ? true : false,
-                    'title' => ($l['id'] == $d->language_id) ? $d->title : '<span class="not_tagged" title="' . $d->term_id . '">' . $d->title . '</span>',
-                    'description' => ($l['id'] == $d->language_id) ? $d->description : '<span class="not_tagged" title="' . $d->term_id . '">' . $d->description . '</span>'
-                );
-            }
-        } else {
-            $final_term['has_translations'] = false;
-            $final_term['lang'] = array(
-                'translated' => true,
-                'title' => $first->title,
-                'description' => $first->description
-            );
-        }
-
-        $this->cache->put('Rocket::Taxonomy::Term::' . $term_id, $final_term, 60 * 0);
-
-        return $final_term;
-    }
-
-    /**
      * Get a term from the cache, localized
      *
      * @param  integer $term_id
      * @return Term
      */
-    public function getTerm($term_id)
+    public function getTerm($term_id, $from_cache = true)
     {
-        if (array_key_exists($term_id, $this->terms)) {
-            $data = $this->terms[$term_id];
-        } else {
-            //TODO :: implement administration part
-            /*global $OUT;
-            if ($OUT->enable_translate_administration) {
-                $data = $this->cacheTerm($term_id);
-                $this->terms[$term_id] = $data;
-
-                $this->admin_taxonomy[$data['vocabulary_id']][] = $data;
-            } else {*/
-            if (!$data = $this->cache->get('Rocket::Taxonomy::Term::' . $term_id)) {
-                $data = $this->cacheTerm($term_id);
-                $this->terms[$term_id] = $data;
-            }
-            //}
+        if ($from_cache && array_key_exists($term_id, $this->terms)) {
+            return $this->terms[$term_id];
         }
 
-        if ($data === false) {
-            return false;
-        }
+        $data = $this->termRepository->getTerm($term_id);
+        $this->terms[$term_id] = $data;
 
         return $data;
     }
@@ -234,7 +170,7 @@ class Taxonomy
     protected function cacheTermsForContent($content_id)
     {
         $term_content = (new TermContent)->getTable();
-        $terms = TermModel::where('content_id', $content_id)
+        $terms = TermContainer::where('content_id', $content_id)
             ->join($term_content, 'id', '=', 'term_id')
             ->get(['term_id', 'vocabulary_id']);
 
@@ -254,6 +190,27 @@ class Taxonomy
         ); //a whole week, cuz it's automatically recached
 
         return $results;
+    }
+
+    /**
+     * Get all paths for a term
+     *
+     * @param int $term_id
+     * @return array<array<int>>
+     */
+    public function getPaths($term_id)
+    {
+        return $this->termHierarchyRepository->getPaths($term_id);
+    }
+
+    /**
+     * Get the complete graph
+     * @param $term_id
+     * @return array|null
+     */
+    public function getAncestry($term_id)
+    {
+        return $this->termHierarchyRepository->getAncestry($term_id);
     }
 
     /**
@@ -300,7 +257,7 @@ class Taxonomy
             'Rocket::Taxonomy::Terms::' . $vocabulary_id,
             60,
             function () use ($vocabulary_id) {
-                $terms = TermModel::where('vocabulary_id', $vocabulary_id)->get(['id']);
+                $terms = TermContainer::where('vocabulary_id', $vocabulary_id)->get(['id']);
 
                 $results = array();
                 if (!empty($terms)) {
@@ -406,9 +363,6 @@ class Taxonomy
 
         DB::table('words')->insert($word);
 
-        //generate cache files
-        $this->cacheTerm($term_id);
-
         //return it
         return $term_id;
     }
@@ -496,5 +450,4 @@ class Taxonomy
             TermContent::whereIn('term_id', $terms)->where('content_id', $content_id)->delete();
         }
     }
-
 }

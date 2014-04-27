@@ -25,7 +25,7 @@ class Hierarchy extends \Eloquent {
      */
     public function term()
     {
-        return $this->belongsTo('Rocket\Taxonomy\Model\Term', 'term_id');
+        return $this->belongsTo('Rocket\Taxonomy\Model\TermContainer', 'term_id');
     }
 
     /**
@@ -33,6 +33,6 @@ class Hierarchy extends \Eloquent {
      */
     public function parent()
     {
-        return $this->belongsTo('Rocket\Taxonomy\Model\Term', 'parent_id');
+        return $this->belongsTo('Rocket\Taxonomy\Model\TermContainer', 'parent_id');
     }
 }

@@ -1,0 +1,143 @@
+<?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: onigoetz
+ * Date: 23.04.14
+ * Time: 20:59
+ */
+
+namespace Rocket\Taxonomy\Repositories;
+
+use DB;
+use CentralDesktop\Graph\Edge\DirectedEdge;
+use CentralDesktop\Graph\Graph\DirectedGraph;
+use CentralDesktop\Graph\Vertex;
+use Rocket\Taxonomy\Model\Hierarchy;
+use Rocket\Taxonomy\PathResolver;
+
+/**
+ * Create paths from a term all the way to all the parents.
+ *
+ * Everything is calculated upside down so that the DFS search for all paths is easy
+ *
+ * @package Rocket\Taxonomy
+ */
+class TermHierarchyRepository implements TermHierarchyRepositoryInterface
+{
+
+    /**
+     * @var array<Vertex> all Vertices (Current and parents)
+     */
+    protected $vertices;
+
+    /**
+     * @var \Illuminate\Cache\Repository
+     */
+    protected $cache;
+
+    /**
+     * @param \Illuminate\Cache\CacheManager $cache
+     */
+    public function __construct(\Illuminate\Cache\CacheManager $cache)
+    {
+        $this->cache = $cache;
+    }
+
+    /**
+     * Get the SQL Query to run on the database to get the recursive content
+     *
+     * @return string
+     */
+    protected function getQuery()
+    {
+        //TODO :: also support real "WITH RECURSIVE" syntax
+
+        $hierarchy_table = (new Hierarchy)->getTable();
+        $temp_name = 'name_tree';
+
+        $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `term_id` = :id";
+        $recursive = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c` join `$temp_name` as `p` on `p`.`parent_id` = `c`.`term_id`";
+        $final = "select distinct * from `$temp_name`";
+
+        return "Call WITH_EMULATOR('$temp_name', '$initial', '$recursive', '$final', 0, 'ENGINE=MEMORY');";
+    }
+
+    /**
+     * Get all parents recursively from database
+     *
+     * @return array
+     */
+    protected function getRawData($id)
+    {
+        return $this->cache->remember(
+            "Rocket::Taxonomy::TermHierarchy::$id",
+            2,
+            function () use ($id) {
+                $raw_query = $this->getQuery();
+                $query = str_replace(':id', $id, $raw_query);
+
+                $start = microtime(true);
+
+                //does not work as a prepared statement; we have to execute it directly
+                $results = DB::getReadPdo()->query($query)->fetchAll(\PDO::FETCH_OBJ);
+
+                //we can't run it through laravel but the best is still to store the results
+                DB::logQuery($raw_query, [$id], round((microtime(true) - $start) * 1000, 2));
+
+                return $results;
+            }
+        );
+    }
+
+    /**
+     * Get all parents recursively
+     *
+     * @return DirectedGraph|null
+     */
+    public function getAncestry($id)
+    {
+        $data = $this->getRawData($id);
+
+        if (empty($data)) {
+            return null;
+        }
+
+        // Create Vertices
+        $this->vertices = [];
+        foreach ($data as $content) {
+            if (!array_key_exists($content->term_id, $this->vertices)) {
+                $this->vertices[$content->term_id] = new Vertex($content->term_id);
+            }
+
+            if (!array_key_exists($content->parent_id, $this->vertices)) {
+                $this->vertices[$content->parent_id] = new Vertex($content->parent_id);
+            }
+        }
+
+        // Create Graph
+        $graph = new DirectedGraph();
+        foreach ($this->vertices as $vertex) {
+            $graph->add_vertex($vertex);
+        }
+
+        // Create Relations
+        foreach ($data as $content) {
+            $graph->create_edge($this->vertices[$content->parent_id], $this->vertices[$content->term_id]);
+        }
+
+        return [$this->vertices[$id], $graph];
+    }
+
+    /**
+     * Get all the possible paths from this term
+     *
+     * @return array<array<int>>
+     */
+    public function getPaths($id)
+    {
+        list($start_vertex, $graph) = $this->getAncestry($id);
+
+        $resolver = new PathResolver($graph);
+        return $resolver->resolvePaths($start_vertex);
+    }
+}

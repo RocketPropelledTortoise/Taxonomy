@@ -8,7 +8,7 @@
 
 namespace Rocket\Taxonomy\Model;
 
-class Term extends \Eloquent
+class TermContainer extends \Eloquent
 {
     /**
      * {@inheritdoc}
@@ -30,7 +30,7 @@ class Term extends \Eloquent
      */
     public function parents()
     {
-        return $this->belongsToMany('Rocket\Taxonomy\Model\Term', 'taxonomy_term_hierarchy', 'term_id', 'parent_id');
+        return $this->belongsToMany('Rocket\Taxonomy\Model\TermContainer', 'taxonomy_term_hierarchy', 'term_id', 'parent_id');
     }
 
     /**

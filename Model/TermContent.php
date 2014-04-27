@@ -24,7 +24,7 @@ class TermContent extends \Eloquent {
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function term() {
-        return $this->belongsTo('Rocket\Taxonomy\Model\Term', 'term_id');
+        return $this->belongsTo('Rocket\Taxonomy\Model\TermContainer', 'term_id');
     }
 
     /**
