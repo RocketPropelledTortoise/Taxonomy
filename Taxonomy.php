@@ -198,9 +198,20 @@ class Taxonomy
      * @param int $term_id
      * @return array<array<int>>
      */
-    public function getPaths($term_id)
+    public function getAncestryPaths($term_id)
     {
-        return $this->termHierarchyRepository->getPaths($term_id);
+        return $this->termHierarchyRepository->getAncestryPaths($term_id);
+    }
+
+    /**
+     * Get all paths for a term
+     *
+     * @param int $term_id
+     * @return array<array<int>>
+     */
+    public function getDescentPaths($term_id)
+    {
+        return $this->termHierarchyRepository->getDescentPaths($term_id);
     }
 
     /**
@@ -211,6 +222,16 @@ class Taxonomy
     public function getAncestry($term_id)
     {
         return $this->termHierarchyRepository->getAncestry($term_id);
+    }
+
+    /**
+     * Get the complete graph
+     * @param $term_id
+     * @return array|null
+     */
+    public function getDescent($term_id)
+    {
+        return $this->termHierarchyRepository->getDescent($term_id);
     }
 
     /**

@@ -48,16 +48,23 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      *
      * @return string
      */
-    protected function getQuery()
+    protected function getQuery($direction)
     {
         //TODO :: also support real "WITH RECURSIVE" syntax
 
         $hierarchy_table = (new Hierarchy)->getTable();
         $temp_name = 'name_tree';
 
-        $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `term_id` = :id";
-        $recursive = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c` join `$temp_name` as `p` on `p`.`parent_id` = `c`.`term_id`";
-        $final = "select distinct * from `$temp_name`";
+        if($direction == 'ancestry') {
+            $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `term_id` = :id";
+            $recursive = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c` join `$temp_name` as `p` on `p`.`parent_id` = `c`.`term_id`";
+            $final = "select distinct * from `$temp_name`";
+        } else {
+            $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `parent_id` = :id";
+            $recursive = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c` join `$temp_name` as `p` on `c`.`parent_id` = `p`.`term_id`";
+            $final = "select distinct * from `$temp_name`";
+        }
+
 
         return "Call WITH_EMULATOR('$temp_name', '$initial', '$recursive', '$final', 0, 'ENGINE=MEMORY');";
     }
@@ -67,13 +74,13 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      *
      * @return array
      */
-    protected function getRawData($id)
+    protected function getRawData($id, $direction)
     {
         return $this->cache->remember(
-            "Rocket::Taxonomy::TermHierarchy::$id",
+            "Rocket::Taxonomy::TermHierarchy::$direction::$id",
             2,
-            function () use ($id) {
-                $raw_query = $this->getQuery();
+            function () use ($id, $direction) {
+                $raw_query = $this->getQuery($direction);
                 $query = str_replace(':id', $id, $raw_query);
 
                 $start = microtime(true);
@@ -89,6 +96,20 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
         );
     }
 
+    protected function prepareVertices($data) {
+        $vertices = [];
+        foreach ($data as $content) {
+            if (!array_key_exists($content->term_id, $vertices)) {
+                $vertices[$content->term_id] = new Vertex($content->term_id);
+            }
+
+            if (!array_key_exists($content->parent_id, $vertices)) {
+                $vertices[$content->parent_id] = new Vertex($content->parent_id);
+            }
+        }
+        return $vertices;
+    }
+
     /**
      * Get all parents recursively
      *
@@ -96,23 +117,14 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      */
     public function getAncestry($id)
     {
-        $data = $this->getRawData($id);
+        $data = $this->getRawData($id, 'ancestry');
 
         if (empty($data)) {
-            return null;
+            return [null, null];
         }
 
         // Create Vertices
-        $this->vertices = [];
-        foreach ($data as $content) {
-            if (!array_key_exists($content->term_id, $this->vertices)) {
-                $this->vertices[$content->term_id] = new Vertex($content->term_id);
-            }
-
-            if (!array_key_exists($content->parent_id, $this->vertices)) {
-                $this->vertices[$content->parent_id] = new Vertex($content->parent_id);
-            }
-        }
+        $this->vertices = $this->prepareVertices($data);
 
         // Create Graph
         $graph = new DirectedGraph();
@@ -129,13 +141,64 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     }
 
     /**
+     * Get all childs recursively
+     *
+     * @return DirectedGraph|null
+     */
+    public function getDescent($id)
+    {
+        $data = $this->getRawData($id, 'descent');
+
+        if (empty($data)) {
+            return [null, null];
+        }
+
+        // Create Vertices
+        $this->vertices = $this->prepareVertices($data);
+
+        // Create Graph
+        $graph = new DirectedGraph();
+        foreach ($this->vertices as $vertex) {
+            $graph->add_vertex($vertex);
+        }
+
+        // Create Relations
+        foreach ($data as $content) {
+            $graph->create_edge($this->vertices[$content->term_id], $this->vertices[$content->parent_id]);
+        }
+
+        return [$this->vertices[$id], $graph];
+    }
+
+    /**
      * Get all the possible paths from this term
      *
      * @return array<array<int>>
      */
-    public function getPaths($id)
+    public function getAncestryPaths($id)
     {
         list($start_vertex, $graph) = $this->getAncestry($id);
+
+        if(!$graph) {
+            return [];
+        }
+
+        $resolver = new PathResolver($graph);
+        return $resolver->resolvePaths($start_vertex);
+    }
+
+    /**
+     * Get all the possible paths from this term
+     *
+     * @return array<array<int>>
+     */
+    public function getDescentPaths($id)
+    {
+        list($start_vertex, $graph) = $this->getDescent($id);
+
+        if(!$graph) {
+            return [];
+        }
 
         $resolver = new PathResolver($graph);
         return $resolver->resolvePaths($start_vertex);

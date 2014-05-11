@@ -26,7 +26,18 @@ interface TermHierarchyRepositoryInterface
     public function getAncestry($id);
 
     /**
+     * Get all parents
+     * @return DirectedGraph|null
+     */
+    public function getDescent($id);
+
+    /**
      * @return array
      */
-    public function getPaths($id);
+    public function getAncestryPaths($id);
+
+    /**
+     * @return array
+     */
+    public function getDescentPaths($id);
 }

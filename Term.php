@@ -117,7 +117,7 @@ class Term implements ArrayAccess
 
     public function renderPaths()
     {
-        $paths = \Taxonomy::getPaths($this->container['term_id']);
+        $paths = \Taxonomy::getAncestryPaths($this->container['term_id']);
 
         $strings = [];
         foreach ($paths as $path) {
