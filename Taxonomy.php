@@ -13,6 +13,7 @@ use Rocket\Taxonomy\Model\Vocabulary;
 use Rocket\Taxonomy\Repositories\TermRepositoryInterface;
 use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface;
 use I18N;
+use DB;
 
 /**
  * Class Taxonomy
@@ -316,18 +317,17 @@ class Taxonomy
             return false;
         }
 
-        $query = DB::table('words');
+        $query = TermData::select('taxonomy_terms.id')
+            ->join('taxonomy_terms', 'taxonomy_terms.id', '=', 'taxonomy_terms_data.term_id')
+            ->where('taxonomy_terms.vocabulary_id', $vocabulary_id)
+            ->where('taxonomy_terms_data.language_id', $language_id)
+            ->where('taxonomy_terms_data.title', $term);
 
         if (count($exclude)) {
-            $query->whereNotIn('terms.id', $exclude);
+            $query->whereNotIn('taxonomy_terms.id', $exclude);
         }
 
-        $row = $query->select('terms.id')
-            ->join('terms', 'terms.id', '=', 'words.term_id')
-            ->where('terms.vocabulary_id', $vocabulary_id)
-            ->where('words.language_id', $language_id)
-            ->where('words.text', $term)
-            ->first();
+        $row = $query->first();
 
         if (!empty($row)) {
             return $row->id;
@@ -373,16 +373,16 @@ class Taxonomy
         if ($parent_id !== 0) {
             $terms['term_id'] = $parent_id;
         }
-        $term_id = DB::table('terms')->insertGetId($terms);
+        $term_id = DB::table('taxonomy_terms')->insertGetId($terms);
 
         //add translations
         $word = array(
             'language_id' => $language_id,
             'term_id' => $term_id,
-            'text' => $term,
+            'title' => $term,
         );
 
-        DB::table('words')->insert($word);
+        DB::table('taxonomy_terms_data')->insert($word);
 
         //return it
         return $term_id;
