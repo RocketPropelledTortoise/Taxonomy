@@ -33,6 +33,10 @@ class TermRepository implements TermRepositoryInterface
             $data = $this->cacheTerm($term_id);
         }
 
+        if (!$data) {
+            return false;
+        }
+
         return new Term($data);
     }
 
