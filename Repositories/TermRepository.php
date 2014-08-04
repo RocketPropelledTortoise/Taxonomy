@@ -51,7 +51,7 @@ class TermRepository implements TermRepositoryInterface
         $data_table = (new TermData)->getTable();
 
         $translations = TermContainer::where($term_table . '.id', $term_id)
-            ->select('term_id', 'vocabulary_id', $data_table . '.id', 'language_id', 'title', 'description')
+            ->select('term_id', 'vocabulary_id', $data_table . '.id', 'language_id', 'title', 'description', 'type')
             ->join($data_table, $term_table . '.id', '=', $data_table . '.term_id')
             ->get();
 
@@ -73,7 +73,7 @@ class TermRepository implements TermRepositoryInterface
             'vocabulary_id' => $first->vocabulary_id,
             'content_id' => $first->content_id,
             'weight' => $first->weight,
-            'type' => (bool)$first->type,
+            'type' => $first->type,
         );
 
         if (T::isTranslatable($first->vocabulary_id)) {
