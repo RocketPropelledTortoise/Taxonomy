@@ -1,12 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 02.03.14
- * Time: 21:35
- */
-
-namespace Rocket\Taxonomy\Model;
+<?php namespace Rocket\Taxonomy\Model;
 
 class Vocabulary extends \Eloquent {
     /**
@@ -18,4 +10,13 @@ class Vocabulary extends \Eloquent {
      * {@inheritdoc}
      */
     protected $table = 'taxonomy_vocabularies';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $fillable = ['name', 'machine_name', 'description', 'hierarchy', 'translatable'];
+
+    function isTranslatable() {
+        return (bool)$this->translatable;
+    }
 }

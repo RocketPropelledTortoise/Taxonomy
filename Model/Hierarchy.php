@@ -1,13 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 05.03.14
- * Time: 22:18
- */
-
-namespace Rocket\Taxonomy\Model;
-
+<?php namespace Rocket\Taxonomy\Model;
 
 class Hierarchy extends \Eloquent {
     /**

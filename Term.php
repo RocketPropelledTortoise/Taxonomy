@@ -1,13 +1,8 @@
-<?php
-
-/**
- * Taxonomy manager : Terms
- */
-
-namespace Rocket\Taxonomy;
+<?php namespace Rocket\Taxonomy;
 
 use ArrayAccess;
-use I18N;
+use Rocket\Translation\I18NFacade as I18N;
+use Rocket\Taxonomy\Facade as T;
 
 /**
  * Taxonomy term
@@ -22,19 +17,25 @@ use I18N;
  *     -> will output the term in the current language
  *
  *     $term->title()
+ *     $term['title']
  *     -> will return the term in the current language
  *
  *     $term->title('en')
  *     -> will output the term in English
  *
+ *     $term->description()
+ *     $term['description']
+ *     -> will return the term's content in the current language
+ *
+ *     $term->description('en')
+ *     -> will output the term's content in English
+ *
  *     $term->translated()
+ *     $term['translated']
  *     -> true if it was translated in the current language
  *
  *     $term->translated('en')
  *     -> true if it was translated in english
- *
- * @todo Document ArrayAccess
- *
  *
  * @package Taxonomy
  */
@@ -46,7 +47,8 @@ class Term implements ArrayAccess
      * @var array
      */
     private $container = array(
-        'has_translations' => true
+        'has_translations' => true,
+        'type' => 0
     );
 
     /**
@@ -57,15 +59,6 @@ class Term implements ArrayAccess
     public function __construct($data)
     {
         $this->container = array_merge($this->container, $data);
-    }
-
-    /**
-     * echo Term - outputs the term in the current language
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->title();
     }
 
     /**
@@ -80,6 +73,36 @@ class Term implements ArrayAccess
     }
 
     /**
+     * Returns true if the vocabulary of the term can be translated
+     *
+     * @return bool
+     */
+    protected function hasTranslations()
+    {
+        return $this->container['has_translations'];
+    }
+
+    /**
+     * Returns true if the term is a (sub)category
+     *
+     * @return bool
+     */
+    public function isSubcategory()
+    {
+        return $this->container['type'] == T::TERM_CATEGORY;
+    }
+
+    /**
+     * Returns the type of the term (category or term)
+     *
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->container['type'];
+    }
+
+    /**
      * Get the term id
      *
      * @return int
@@ -90,16 +113,8 @@ class Term implements ArrayAccess
     }
 
     /**
-     * @deprecated
-     * @param string $language
-     */
-    public function text($language = '')
-    {
-        \Log::warning('deprectated $text');
-        return $this->string('title', $language);
-    }
-
-    /**
+     * Get the term's title
+     *
      * @param string $language
      */
     public function title($language = '')
@@ -108,27 +123,13 @@ class Term implements ArrayAccess
     }
 
     /**
+     * Get the term's description
+     *
      * @param string $language
      */
     public function description($language = '')
     {
         return $this->string('description', $language);
-    }
-
-    public function renderPaths()
-    {
-        $paths = \Taxonomy::getAncestryPaths($this->container['term_id']);
-
-        $strings = [];
-        foreach ($paths as $path) {
-            $string = [];
-            foreach($path as $id) {
-                $string[] = \Taxonomy::getTerm($id)->text();
-            }
-            $strings[] = implode(' <small>&#8594;</small> ', $string);
-        }
-
-        return implode('<br />', $strings);
     }
 
     /**
@@ -139,7 +140,7 @@ class Term implements ArrayAccess
      */
     public function string($key, $language = '')
     {
-        if (!$this->container['has_translations']) {
+        if (!$this->hasTranslations()) {
             return $this->container['lang'][$key];
         }
 
@@ -154,16 +155,6 @@ class Term implements ArrayAccess
         return '';
     }
 
-    public function isSubcategory()
-    {
-        return $this->container['type'] == 1;
-    }
-
-    public function getType()
-    {
-        return $this->container['type'];
-    }
-
     /**
      * Is it translated in this language ?
      *
@@ -172,19 +163,40 @@ class Term implements ArrayAccess
      */
     public function translated($language = '')
     {
-        if (!$this->container['has_translations']) {
-            return $this->container['lang']['translate'];
-        } else {
-            if ($language == '') {
-                $language = I18N::getCurrent();
-            }
+        if (!$this->hasTranslations()) {
+            return true;
+        }
 
-            if (array_key_exists('lang_' . $language, $this->container)) {
-                return $this->container['lang_' . $language]['translated'];
-            }
+        if ($language == '') {
+            $language = I18N::getCurrent();
+        }
+
+        if (array_key_exists('lang_' . $language, $this->container)) {
+            return $this->container['lang_' . $language]['translated'];
         }
 
         return false;
+    }
+
+    /**
+     * Get the term's hierarchy and paths
+     *
+     * @return string
+     */
+    public function renderPaths()
+    {
+        $paths = T::getAncestryPaths($this->container['term_id']);
+
+        $strings = [];
+        foreach ($paths as $path) {
+            $string = [];
+            foreach($path as $id) {
+                $string[] = T::getTerm($id)->title();
+            }
+            $strings[] = implode(' <small>&#8594;</small> ', $string);
+        }
+
+        return implode('<br />', $strings);
     }
 
     /**
@@ -195,9 +207,7 @@ class Term implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
-            $this->container[] = $value;
-        } else {
+        if (!is_null($offset)) {
             $this->container[$offset] = $value;
         }
     }
@@ -231,16 +241,11 @@ class Term implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        if (!in_array($offset, ['title', 'description', 'text', 'translated'])) {
+        if (!in_array($offset, ['title', 'description', 'translated'])) {
             return isset($this->container[$offset]) ? $this->container[$offset] : null;
         }
 
-        if ($offset == 'text') {
-            $offset = 'title';
-            \Log::warning('text is deprecated implemented');
-        }
-
-        if (!$this->container['has_translations']) {
+        if (!$this->hasTranslations()) {
             return $this->container['lang'][$offset];
         }
 
@@ -249,5 +254,14 @@ class Term implements ArrayAccess
         }
 
         return null;
+    }
+
+    /**
+     * echo Term - outputs the term in the current language
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->title();
     }
 }

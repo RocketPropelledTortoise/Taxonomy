@@ -1,9 +1,4 @@
-<?php
-/**
- * Taxonomy facade
- */
-
-namespace Rocket\Taxonomy;
+<?php namespace Rocket\Taxonomy;
 
 /**
  * Class Taxonomy

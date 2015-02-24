@@ -1,12 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 23.04.14
- * Time: 20:59
- */
-
-namespace Rocket\Taxonomy\Repositories;
+<?php namespace Rocket\Taxonomy\Repositories;
 
 use DB;
 use CentralDesktop\Graph\Edge\DirectedEdge;

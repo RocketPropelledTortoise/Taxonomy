@@ -153,12 +153,18 @@ BEGIN
   # We are done :-)
 END;
 SQL;
-        DB::connection()->getPdo()->exec($sql);
+
+        // @codeCoverageIgnoreStart
+        if (DB::connection()->getDriverName() == 'mysql') {
+            DB::connection()->getPdo()->exec($sql);
+        }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
      * Reverse the migrations.
      *
+     * @codeCoverageIgnore
      * @return void
      */
     public function down()

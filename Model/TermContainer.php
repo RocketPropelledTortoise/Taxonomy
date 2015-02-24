@@ -1,12 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 02.03.14
- * Time: 21:35
- */
-
-namespace Rocket\Taxonomy\Model;
+<?php namespace Rocket\Taxonomy\Model;
 
 class TermContainer extends \Eloquent
 {
@@ -40,14 +32,4 @@ class TermContainer extends \Eloquent
     {
         return $this->belongsTo('Rocket\Taxonomy\Model\Vocabulary', 'vocabulary_id');
     }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function contents()
-    {
-        return $this->belongsToMany('Content', 'taxonomy_content', 'term_id', 'content_id');
-    }
-
-
 }

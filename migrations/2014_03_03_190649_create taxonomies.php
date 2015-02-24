@@ -67,12 +67,12 @@ class CreateTaxonomies extends Migration
             'taxonomy_content',
             function (Blueprint $table) {
                 $table->unsignedInteger('term_id');
-                $table->integer('content_id'); //TODO :: modifiy to unsigned int
+                $table->unsignedInteger('relationable_id');
+                $table->string('relationable_type');
 
                 $table->foreign('term_id')->references('id')->on('taxonomy_terms');
-                $table->foreign('content_id')->references('id')->on('contents');
 
-                $table->primary(['term_id', 'content_id']);
+                $table->primary(['term_id', 'relationable_id', 'relationable_type']);
             }
         );
     }
@@ -80,6 +80,7 @@ class CreateTaxonomies extends Migration
     /**
      * Reverse the migrations.
      *
+     * @codeCoverageIgnore
      * @return void
      */
     public function down()

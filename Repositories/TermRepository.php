@@ -1,12 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 27.04.14
- * Time: 18:24
- */
-
-namespace Rocket\Taxonomy\Repositories;
+<?php namespace Rocket\Taxonomy\Repositories;
 
 use Rocket\Translation\I18NFacade as I18N;
 use Rocket\Taxonomy\Facade as T;
@@ -22,6 +14,8 @@ class TermRepository implements TermRepositoryInterface
      */
     protected $cache;
 
+    protected static $cacheKey = 'Rocket::Taxonomy::Term::';
+
     public function __construct(\Illuminate\Cache\CacheManager $cache)
     {
         $this->cache = $cache;
@@ -29,12 +23,12 @@ class TermRepository implements TermRepositoryInterface
 
     public function getTerm($term_id, $from_cache = true)
     {
-        if (!$from_cache || !$data = $this->cache->get('Rocket::Taxonomy::Term::' . $term_id)) {
+        if (!$from_cache || !$data = $this->cache->get(self::$cacheKey . $term_id)) {
             $data = $this->cacheTerm($term_id);
         }
 
         if (!$data) {
-            return false;
+            return null;
         }
 
         return new Term($data);
@@ -86,8 +80,8 @@ class TermRepository implements TermRepositoryInterface
 
                 $final_term['lang_' . $lang] = array(
                     'translated' => ($l['id'] == $d->language_id) ? true : false,
-                    'title' => ($l['id'] == $d->language_id) ? $d->title : '<span class="not_tagged" title="' . $d->term_id . '">' . $d->title . '</span>',
-                    'description' => ($l['id'] == $d->language_id) ? $d->description : '<span class="not_tagged" title="' . $d->term_id . '">' . $d->description . '</span>'
+                    'title' => $first->title,
+                    'description' => $first->description
                 );
             }
         } else {
@@ -99,7 +93,7 @@ class TermRepository implements TermRepositoryInterface
             );
         }
 
-        $this->cache->put('Rocket::Taxonomy::Term::' . $term_id, $final_term, 60 * 0);
+        $this->cache->put(self::$cacheKey . $term_id, $final_term, 60 * 0);
 
         return $final_term;
     }

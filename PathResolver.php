@@ -1,12 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 27.04.14
- * Time: 22:10
- */
-
-namespace Rocket\Taxonomy;
+<?php namespace Rocket\Taxonomy;
 
 use CentralDesktop\Graph\Edge\DirectedEdge;
 use CentralDesktop\Graph\Graph\DirectedGraph;

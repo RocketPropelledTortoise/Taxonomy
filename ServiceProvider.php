@@ -1,9 +1,4 @@
-<?php
-/**
- * Service Provider : Taxonomy
- */
-
-namespace Rocket\Taxonomy;
+<?php namespace Rocket\Taxonomy;
 
 /**
  * Taxonomy Service Provider

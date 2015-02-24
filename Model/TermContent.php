@@ -1,13 +1,4 @@
-<?php
-/**
- * Created by IntelliJ IDEA.
- * User: onigoetz
- * Date: 06.03.14
- * Time: 23:09
- */
-
-namespace Rocket\Taxonomy\Model;
-
+<?php namespace Rocket\Taxonomy\Model;
 
 class TermContent extends \Eloquent {
     /**
@@ -21,16 +12,23 @@ class TermContent extends \Eloquent {
     protected $table = 'taxonomy_content';
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * {@inheritdoc}
      */
-    public function term() {
-        return $this->belongsTo('Rocket\Taxonomy\Model\TermContainer', 'term_id');
-    }
+    protected $fillable = ['term_id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function content() {
-        return $this->belongsTo('Content', 'content_id');
+    public function term()
+    {
+        return $this->belongsTo('Rocket\Taxonomy\Model\TermContainer', 'term_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function relationable()
+    {
+        return $this->morphTo();
     }
 }
