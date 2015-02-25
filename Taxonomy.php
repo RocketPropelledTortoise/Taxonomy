@@ -155,6 +155,15 @@ class Taxonomy
         return $data;
     }
 
+    public function uncacheTerm($term_id)
+    {
+        if (array_key_exists($term_id, $this->terms)) {
+            unset($this->terms[$term_id]);
+        }
+
+        return $this->termRepository->uncacheTerm($term_id);
+    }
+
     /**
      * Get all paths for a term
      *
@@ -257,16 +266,16 @@ class Taxonomy
     /**
      * Returns the id of a term, if it doesn't exist, creates it.
      *
-     * @param $term
+     * @param  string $title
      * @param  int $vocabulary_id
      * @param  int $language_id
      * @param  int $type
      * @return bool|int
      */
-    public function getTermId($term, $vocabulary_id, $language_id = null, $type = 0)
+    public function getTermId($title, $vocabulary_id, $language_id = null, $type = 0)
     {
-        $term = trim($term);
-        if ($term == '') {
+        $title = trim($title);
+        if ($title == '') {
             return false;
         }
 
@@ -276,32 +285,28 @@ class Taxonomy
 
         $language_id = $this->getLanguage($vocabulary_id, $language_id);
 
-        $search = $this->searchTerm($term, $vocabulary_id, $language_id);
+        $search = $this->searchTerm($title, $vocabulary_id, $language_id);
         if ($search) {
             return $search;
         }
 
         // Add term
-        $terms = [
-            'vocabulary_id' => $vocabulary_id,
-        ];
+        $term = new TermContainer(['vocabulary_id' => $vocabulary_id]);
 
         if ($type !== 0) {
-            $terms['type'] = $type;
+            $term->type = $type;
         }
-        $term_id = TermContainer::insertGetId($terms);
+        $term->save();
 
-        // Add translations
-        $word = [
+        // Add translation
+        $translation = [
             'language_id' => $language_id,
-            'term_id' => $term_id,
-            'title' => $term,
+            'title' => $title,
         ];
-
-        TermData::insert($word);
+        $term->translations()->save(new TermData($translation));
 
         //return it
-        return $term_id;
+        return $term->id;
     }
 
     /**

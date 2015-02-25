@@ -3,4 +3,6 @@
 interface TermRepositoryInterface
 {
     public function getTerm($term_id);
+
+    public function uncacheTerm($term_id);
 }

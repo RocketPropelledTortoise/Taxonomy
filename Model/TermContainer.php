@@ -12,6 +12,14 @@ class TermContainer extends \Eloquent
      */
     protected $table = 'taxonomy_terms';
 
+    /**
+     * {@inheritdoc}
+     */
+    protected $fillable = ['vocabulary_id', 'type'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function translations()
     {
         return $this->hasMany('Rocket\Taxonomy\Model\TermData', 'term_id');

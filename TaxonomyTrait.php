@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Collection;
 use Rocket\Taxonomy\Facade as T;
-use Rocket\Taxonomy\Model\TermContent;
 use Rocket\Taxonomy\Model\TermContainer;
 use Illuminate\Support\Facades\Cache;
 
