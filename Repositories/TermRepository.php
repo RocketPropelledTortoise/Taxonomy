@@ -1,10 +1,10 @@
 <?php namespace Rocket\Taxonomy\Repositories;
 
-use Rocket\Translation\I18NFacade as I18N;
 use Rocket\Taxonomy\Facade as T;
 use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Term;
+use Rocket\Translation\I18NFacade as I18N;
 
 class TermRepository implements TermRepositoryInterface
 {

@@ -1,14 +1,12 @@
 <?php namespace Rocket\Taxonomy;
 
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Rocket\Taxonomy\Model\TermContainer;
-use Rocket\Taxonomy\Model\TermContent;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Model\Vocabulary;
-use Rocket\Taxonomy\Repositories\TermRepositoryInterface as TermRep;
 use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface as TermHieraRep;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Rocket\Taxonomy\Repositories\TermRepositoryInterface as TermRep;
 use Rocket\Translation\I18NFacade as I18N;
-use DB;
 
 /**
  * Class Taxonomy
@@ -86,6 +84,15 @@ class Taxonomy
         return $this->vocabularyById[$vid]->isTranslatable();
     }
 
+    /**
+     * Get the internal language for the vocabulary
+     *
+     * This will return the language_id if the vocabulary is translated or 1 if it's not
+     *
+     * @param integer|string $vocabulary_id
+     * @param integer $language_id
+     * @return integer|null
+     */
     public function getLanguage($vocabulary_id, $language_id = null)
     {
         if (!$this->isTranslatable($vocabulary_id)) {

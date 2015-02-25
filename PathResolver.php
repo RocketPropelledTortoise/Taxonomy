@@ -31,7 +31,7 @@ class PathResolver
         $this->paths = array();
 
         /**
-         * @var $edge Edge\DirectedEdge
+         * @var $edge DirectedEdge
          */
         foreach ($start_vertex->incoming_edges as $edge) {
             $this->current_path = array($start_vertex->get_data());
@@ -42,7 +42,7 @@ class PathResolver
 
     /**
      * @param Vertex $start
-     * @param Edge\DirectedEdge $edge
+     * @param DirectedEdge $edge
      */
     protected function getPathsRecursion(Vertex $start, DirectedEdge $edge)
     {

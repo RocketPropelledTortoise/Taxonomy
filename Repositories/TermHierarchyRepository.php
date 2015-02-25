@@ -1,9 +1,8 @@
 <?php namespace Rocket\Taxonomy\Repositories;
 
-use DB;
-use CentralDesktop\Graph\Edge\DirectedEdge;
 use CentralDesktop\Graph\Graph\DirectedGraph;
 use CentralDesktop\Graph\Vertex;
+use DB;
 use Rocket\Taxonomy\Model\Hierarchy;
 use Rocket\Taxonomy\PathResolver;
 
@@ -28,7 +27,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     protected $cache;
 
     /**
-     * @param \Illuminate\Cache\CacheManager $cache
+     * @param \Illuminate\Cache\Repository $cache
      */
     public function __construct(\Illuminate\Cache\Repository $cache)
     {
@@ -67,6 +66,8 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     /**
      * Get all parents recursively from database
      *
+     * @param int $id
+     * @param string $direction
      * @return array
      */
     protected function getRawData($id, $direction)
