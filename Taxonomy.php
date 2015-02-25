@@ -37,7 +37,7 @@ class Taxonomy
     protected $vocabularyByName = [];
 
     /**
-     * @var \Illuminate\Cache\Repository
+     * @var CacheRepository
      */
     protected $cache;
 
@@ -173,7 +173,7 @@ class Taxonomy
     /**
      * Get the complete graph
      * @param $term_id
-     * @return array|null
+     * @return array
      */
     public function getAncestry($term_id)
     {
@@ -183,7 +183,7 @@ class Taxonomy
     /**
      * Get the complete graph
      * @param $term_id
-     * @return array|null
+     * @return array
      */
     public function getDescent($term_id)
     {
@@ -253,7 +253,7 @@ class Taxonomy
      * @param $term
      * @param  int $vocabulary_id
      * @param  int $language_id
-     * @param  int $parent_id
+     * @param  int $type
      * @return bool|int
      */
     public function getTermId($term, $vocabulary_id, $language_id = null, $type = 0)
@@ -270,7 +270,7 @@ class Taxonomy
         $language_id = $this->getLanguage($vocabulary_id, $language_id);
 
         $search = $this->searchTerm($term, $vocabulary_id, $language_id);
-        if ($search != null) {
+        if ($search) {
             return $search;
         }
 

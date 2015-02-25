@@ -9,6 +9,17 @@ use Illuminate\Support\Facades\Cache;
 trait TaxonomyTrait
 {
 
+    abstract public function morphToMany(
+        $related,
+        $name,
+        $table = null,
+        $foreignKey = null,
+        $otherKey = null,
+        $inverse = false
+    );
+    abstract public function getTable();
+    abstract public function getKey();
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
@@ -95,7 +106,7 @@ trait TaxonomyTrait
      */
     public function removeTerms($vocabulary_id = null)
     {
-        if ($vocabulary_id == null) {
+        if ($vocabulary_id === null) {
             return $this->getTaxonomyQuery()->delete();
         }
 

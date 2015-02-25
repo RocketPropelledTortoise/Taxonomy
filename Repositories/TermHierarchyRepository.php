@@ -30,7 +30,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     /**
      * @param \Illuminate\Cache\CacheManager $cache
      */
-    public function __construct(\Illuminate\Cache\CacheManager $cache)
+    public function __construct(\Illuminate\Cache\Repository $cache)
     {
         $this->cache = $cache;
     }
@@ -57,7 +57,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
             $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `parent_id` = :id";
             $recursive = "$recursive_base join `$temp_name` as `p` on `c`.`parent_id` = `p`.`term_id`";
         }
-        
+
         $final = "select distinct * from `$temp_name`";
 
 
@@ -109,7 +109,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     /**
      * Get all parents recursively
      *
-     * @return DirectedGraph|null
+     * @return array Vertex, DirectedGraph
      */
     public function getAncestry($id)
     {
@@ -139,7 +139,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     /**
      * Get all childs recursively
      *
-     * @return DirectedGraph|null
+     * @return array Vertex, DirectedGraph
      */
     public function getDescent($id)
     {

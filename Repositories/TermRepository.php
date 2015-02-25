@@ -16,7 +16,7 @@ class TermRepository implements TermRepositoryInterface
 
     protected static $cacheKey = 'Rocket::Taxonomy::Term::';
 
-    public function __construct(\Illuminate\Cache\CacheManager $cache)
+    public function __construct(\Illuminate\Cache\Repository $cache)
     {
         $this->cache = $cache;
     }

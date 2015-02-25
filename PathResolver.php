@@ -12,7 +12,7 @@ class PathResolver
     protected $paths;
 
     /**
-     * @var \ArrayObject
+     * @var array<integer>
      */
     protected $current_path;
 
