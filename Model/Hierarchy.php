@@ -13,6 +13,7 @@ class Hierarchy extends \Eloquent
     protected $table = 'taxonomy_term_hierarchy';
 
     /**
+     * @codeCoverageIgnore
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function term()
@@ -21,6 +22,7 @@ class Hierarchy extends \Eloquent
     }
 
     /**
+     * @codeCoverageIgnore
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function parent()

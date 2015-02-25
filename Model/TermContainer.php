@@ -18,6 +18,7 @@ class TermContainer extends \Eloquent
     }
 
     /**
+     * @codeCoverageIgnore
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function vocabulary()

@@ -18,6 +18,7 @@ class TermContent extends \Eloquent
     protected $fillable = ['term_id'];
 
     /**
+     * @codeCoverageIgnore
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function term()
@@ -26,6 +27,7 @@ class TermContent extends \Eloquent
     }
 
     /**
+     * @codeCoverageIgnore
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function relationable()

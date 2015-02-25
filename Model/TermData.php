@@ -13,6 +13,7 @@ class TermData extends \Eloquent
     protected $table = 'taxonomy_terms_data';
 
     /**
+     * @codeCoverageIgnore
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function term()
