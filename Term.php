@@ -179,27 +179,6 @@ class Term implements ArrayAccess
     }
 
     /**
-     * Get the term's hierarchy and paths
-     *
-     * @return string
-     */
-    public function renderPaths()
-    {
-        $paths = T::getAncestryPaths($this->container['term_id']);
-
-        $strings = [];
-        foreach ($paths as $path) {
-            $string = [];
-            foreach ($path as $id) {
-                $string[] = T::getTerm($id)->title();
-            }
-            $strings[] = implode(' <small>&#8594;</small> ', $string);
-        }
-
-        return implode('<br />', $strings);
-    }
-
-    /**
      * Array access
      *
      * @param mixed $offset
