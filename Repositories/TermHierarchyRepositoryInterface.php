@@ -2,7 +2,6 @@
 
 use CentralDesktop\Graph\Graph\DirectedGraph;
 
-
 /**
  * Create paths from a term all the way to all the parents.
  *

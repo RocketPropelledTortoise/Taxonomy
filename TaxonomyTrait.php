@@ -14,7 +14,8 @@ trait TaxonomyTrait
      */
     public function taxonomies()
     {
-        return $this->morphToMany('Rocket\Taxonomy\Model\TermContainer', 'relationable', 'taxonomy_content', null, 'term_id');
+        $class = 'Rocket\Taxonomy\Model\TermContainer';
+        return $this->morphToMany($class, 'relationable', 'taxonomy_content', null, 'term_id');
     }
 
     /**
@@ -25,8 +26,9 @@ trait TaxonomyTrait
      *
      * @return void
      */
-    public function scopeGetAllByTermId($query, $term_id) {
-        return $query->whereHas('taxonomies', function($q) use($term_id) {
+    public function scopeGetAllByTermId($query, $term_id)
+    {
+        return $query->whereHas('taxonomies', function($q) use ($term_id) {
             $q->where('term_id', $term_id);
         });
     }

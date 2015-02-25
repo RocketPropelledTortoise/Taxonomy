@@ -1,6 +1,7 @@
 <?php namespace Rocket\Taxonomy\Model;
 
-class Hierarchy extends \Eloquent {
+class Hierarchy extends \Eloquent
+{
     /**
      * {@inheritdoc}
      */

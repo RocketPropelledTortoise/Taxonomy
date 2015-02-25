@@ -1,6 +1,7 @@
 <?php namespace Rocket\Taxonomy\Model;
 
-class TermData extends \Eloquent {
+class TermData extends \Eloquent
+{
     /**
      * {@inheritdoc}
      */

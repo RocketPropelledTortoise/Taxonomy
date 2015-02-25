@@ -4,8 +4,8 @@ use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermContent;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Model\Vocabulary;
-use Rocket\Taxonomy\Repositories\TermRepositoryInterface;
-use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface;
+use Rocket\Taxonomy\Repositories\TermRepositoryInterface as TermRep;
+use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface as TermHieraRep;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Rocket\Translation\I18NFacade as I18N;
 use DB;
@@ -42,19 +42,19 @@ class Taxonomy
     protected $cache;
 
     /**
-     * @var TermRepositoryInterface
+     * @var TermRep
      */
     protected $termRepository;
 
     /**
-     * @var TermHierarchyRepositoryInterface
+     * @var TermHieraRep
      */
     protected $termHierarchyRepository;
 
     /**
      * Initialize the taxonomy, Loads all existing taxonomies
      */
-    public function __construct(CacheRepository $cache, TermRepositoryInterface $termRepository, TermHierarchyRepositoryInterface $termHierarchyRepository)
+    public function __construct(CacheRepository $cache, TermRep $termRepository, TermHieraRep $termHierarchyRepository)
     {
         $this->termRepository = $termRepository;
         $this->termHierarchyRepository = $termHierarchyRepository;
@@ -225,7 +225,7 @@ class Taxonomy
      * @param  array $exclude
      * @return int|null
      */
-    public function searchTerm($term, $vocabulary_id, $language_id = null, $exclude =  [])
+    public function searchTerm($term, $vocabulary_id, $language_id = null, $exclude = [])
     {
         $language_id = $this->getLanguage($vocabulary_id, $language_id);
 

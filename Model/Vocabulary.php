@@ -1,6 +1,7 @@
 <?php namespace Rocket\Taxonomy\Model;
 
-class Vocabulary extends \Eloquent {
+class Vocabulary extends \Eloquent
+{
     /**
      * {@inheritdoc}
      */
@@ -16,7 +17,8 @@ class Vocabulary extends \Eloquent {
      */
     protected $fillable = ['name', 'machine_name', 'description', 'hierarchy', 'translatable'];
 
-    function isTranslatable() {
+    public function isTranslatable()
+    {
         return (bool)$this->translatable;
     }
 }

@@ -17,12 +17,13 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('Rocket\Taxonomy\Repositories\TermRepositoryInterface', 'Rocket\Taxonomy\Repositories\TermRepository');
-        $this->app->bind('Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface', 'Rocket\Taxonomy\Repositories\TermHierarchyRepository');
+        $prefix = 'Rocket\Taxonomy\Repositories';
+        $this->app->bind("$prefix\TermRepositoryInterface", "$prefix\TermRepository");
+        $this->app->bind("$prefix\TermHierarchyRepositoryInterface", "$prefix\TermHierarchyRepository");
 
         $this->app['taxonomy'] = $this->app->share(
             function ($app) {
-                return $this->app->make('\Rocket\Taxonomy\Taxonomy');
+                return $app->make('\Rocket\Taxonomy\Taxonomy');
             }
         );
     }

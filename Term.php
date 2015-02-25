@@ -190,7 +190,7 @@ class Term implements ArrayAccess
         $strings = [];
         foreach ($paths as $path) {
             $string = [];
-            foreach($path as $id) {
+            foreach ($path as $id) {
                 $string[] = T::getTerm($id)->title();
             }
             $strings[] = implode(' <small>&#8594;</small> ', $string);

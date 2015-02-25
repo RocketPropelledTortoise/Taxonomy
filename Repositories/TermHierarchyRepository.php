@@ -43,19 +43,22 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     protected function getQuery($direction)
     {
         //TODO :: also support real "WITH RECURSIVE" syntax
+        //TODO :: also add fallback to simple recursive calls
 
         $hierarchy_table = (new Hierarchy)->getTable();
         $temp_name = 'name_tree';
 
-        if($direction == 'ancestry') {
+        $recursive_base = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c`";
+
+        if ($direction == 'ancestry') {
             $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `term_id` = :id";
-            $recursive = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c` join `$temp_name` as `p` on `p`.`parent_id` = `c`.`term_id`";
-            $final = "select distinct * from `$temp_name`";
+            $recursive = "$recursive_base join `$temp_name` as `p` on `p`.`parent_id` = `c`.`term_id`";
         } else {
             $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `parent_id` = :id";
-            $recursive = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c` join `$temp_name` as `p` on `c`.`parent_id` = `p`.`term_id`";
-            $final = "select distinct * from `$temp_name`";
+            $recursive = "$recursive_base join `$temp_name` as `p` on `c`.`parent_id` = `p`.`term_id`";
         }
+        
+        $final = "select distinct * from `$temp_name`";
 
 
         return "Call WITH_EMULATOR('$temp_name', '$initial', '$recursive', '$final', 0, 'ENGINE=MEMORY');";
@@ -88,7 +91,8 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
         );
     }
 
-    protected function prepareVertices($data) {
+    protected function prepareVertices($data)
+    {
         $vertices = [];
         foreach ($data as $content) {
             if (!array_key_exists($content->term_id, $vertices)) {
@@ -171,7 +175,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     {
         list($start_vertex, $graph) = $this->getAncestry($id);
 
-        if(!$graph) {
+        if (!$graph) {
             return [];
         }
 
@@ -188,7 +192,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     {
         list($start_vertex, $graph) = $this->getDescent($id);
 
-        if(!$graph) {
+        if (!$graph) {
             return [];
         }
 

@@ -18,14 +18,6 @@ class TermContainer extends \Eloquent
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function parents()
-    {
-        return $this->belongsToMany('Rocket\Taxonomy\Model\TermContainer', 'taxonomy_term_hierarchy', 'term_id', 'parent_id');
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function vocabulary()
