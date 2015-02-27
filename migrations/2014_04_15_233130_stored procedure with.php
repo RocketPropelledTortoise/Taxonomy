@@ -157,7 +157,7 @@ SQL;
             return;
         }
 
-        DB::connection()->getPdo()->exec(self::$procedure);
+        DB::connection()->getPdo()->exec(self::$PROCEDURE);
     }
 
     /**

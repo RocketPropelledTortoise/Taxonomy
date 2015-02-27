@@ -41,7 +41,7 @@ class CreateTaxonomies extends Migration
             function (Blueprint $table) {
                 $table->increments('id');
                 $table->unsignedInteger('term_id');
-                $table->integer('language_id'); // TODO :: modify to unsigned int
+                $table->unsignedInteger('language_id');
                 $table->string('title', 255);
                 $table->text('description')->nullable();
 
@@ -72,7 +72,7 @@ class CreateTaxonomies extends Migration
 
                 $table->foreign('term_id')->references('id')->on('taxonomy_terms');
 
-                $table->primary(['term_id', 'relationable_id', 'relationable_type']);
+                $table->primary(['term_id', 'relationable_id', 'relationable_type'], 'taxonomy_contents_composed_primary');
             }
         );
     }
