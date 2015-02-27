@@ -5,46 +5,38 @@ use Illuminate\Database\Migrations\Migration;
 
 class StoredProcedureWith extends Migration
 {
-
     /**
-     * Run the migrations.
+     * Usage: the standard syntax:
+     * WITH RECURSIVE recursive_table AS
+     * (initial_SELECT
+     *  UNION ALL
+     *  recursive_SELECT)
+     *  final_SELECT;
+     * should be translated by you to
+     * CALL WITH_EMULATOR(recursive_table, initial_SELECT, recursive_SELECT, final_SELECT, 0, "").
      *
-     * @return void
+     * ALGORITHM:
+     * 1) we have an initial table T0 (actual name is an argument "recursive_table"), we fill it with result of initial_SELECT.
+     * 2) We have a union table U, initially empty.
+     * 3) Loop:
+     *      add rows of T0 to U,
+     *      run recursive_SELECT based on T0 and put result into table T1,
+     *      if T1 is empty
+     *          leave loop
+     *      else
+     *          swap T0 and T1 (renaming) and empty T1
+     * 4) Drop T0, T1
+     * 5) Rename U to T0
+     * 6) run final select, send relult to client
+     *
+     * This is for *one* recursive table.
+     * It would be possible to write a SP creating multiple recursive tables.
+     *
+     * Largely inspired from :: http://guilhembichot.blogspot.co.uk/2013/11/with-recursive-and-mysql.html
+     *
+     * @var string
      */
-    public function up()
-    {
-        //Largely inspired from :: http://guilhembichot.blogspot.co.uk/2013/11/with-recursive-and-mysql.html
-
-        /*
-        # Usage: the standard syntax:
-        #   WITH RECURSIVE recursive_table AS
-        #    (initial_SELECT
-        #     UNION ALL
-        #     recursive_SELECT)
-        #   final_SELECT;
-        # should be translated by you to
-        # CALL WITH_EMULATOR(recursive_table, initial_SELECT, recursive_SELECT,
-        #                    final_SELECT, 0, "").
-
-        # ALGORITHM:
-        # 1) we have an initial table T0 (actual name is an argument
-        # "recursive_table"), we fill it with result of initial_SELECT.
-        # 2) We have a union table U, initially empty.
-        # 3) Loop:
-        #   add rows of T0 to U,
-        #   run recursive_SELECT based on T0 and put result into table T1,
-        #   if T1 is empty
-        #      then leave loop,
-        #      else swap T0 and T1 (renaming) and empty T1
-        # 4) Drop T0, T1
-        # 5) Rename U to T0
-        # 6) run final select, send relult to client
-
-        # This is for *one* recursive table.
-        # It would be possible to write a SP creating multiple recursive tables.
-        */
-
-        $sql = <<<SQL
+    protected static $PROCEDURE = <<<SQL
 DROP PROCEDURE IF EXISTS WITH_EMULATOR;
 CREATE PROCEDURE WITH_EMULATOR(
   recursive_table      VARCHAR(100),   # name of recursive table
@@ -154,21 +146,30 @@ BEGIN
 END;
 SQL;
 
-        // @codeCoverageIgnoreStart
-        if (DB::connection()->getDriverName() == 'mysql') {
-            DB::connection()->getPdo()->exec($sql);
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if (DB::connection()->getDriverName() != 'mysql') {
+            return;
         }
-        // @codeCoverageIgnoreEnd
+
+        DB::connection()->getPdo()->exec(self::$procedure);
     }
 
     /**
      * Reverse the migrations.
      *
-     * @codeCoverageIgnore
      * @return void
      */
     public function down()
     {
+        if (DB::connection()->getDriverName() != 'mysql') {
+            return;
+        }
         DB::connection()->getPdo()->exec("DROP PROCEDURE IF EXISTS WITH_EMULATOR");
     }
 }
