@@ -36,7 +36,8 @@ class TermData extends \Eloquent
     /**
      * {@inheritdoc}
      */
-    public function save(array $options = array()) {
+    public function save(array $options = array())
+    {
         if ($this->translated == false) {
             $this->translated = true;
         }
