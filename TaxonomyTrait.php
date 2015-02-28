@@ -109,6 +109,10 @@ trait TaxonomyTrait
             return $this->getTaxonomyQuery()->delete();
         }
 
+        if (!is_numeric($vocabulary_id)) {
+            $vocabulary_id = T::vocabulary($vocabulary_id);
+        }
+
         return $this->getTaxonomyQuery()->whereIn('term_id', function($query) use ($vocabulary_id) {
             $query->select('id')->where('vocabulary_id', $vocabulary_id)->from((new TermContainer)->getTable());
         })->delete();
