@@ -70,8 +70,11 @@ class TermRepository implements TermRepositoryInterface
                 if (array_key_exists($l['id'], $translations)) {
                     $term = $translations[$l['id']];
                 } else {
-                    $term = clone $first;
+                    $term = new TermData();
+                    $term->term_id = $term_id;
                     $term->language_id = $l['id'];
+                    $term->title = $first->title;
+                    $term->description = $first->description;
                     $term->translated = false;
                 }
 

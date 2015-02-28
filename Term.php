@@ -65,7 +65,7 @@ class Term implements ArrayAccess
      * Wake from sleep
      *
      * @param  array $data
-     * @return \Taxonomy\Term
+     * @return Term
      */
     public static function __set_state($data)
     {
@@ -116,6 +116,7 @@ class Term implements ArrayAccess
      * Get the term's title
      *
      * @param string $language
+     * @return string
      */
     public function title($language = '')
     {
@@ -126,6 +127,7 @@ class Term implements ArrayAccess
      * Get the term's description
      *
      * @param string $language
+     * @return string
      */
     public function description($language = '')
     {
@@ -176,6 +178,21 @@ class Term implements ArrayAccess
         }
 
         return false;
+    }
+
+    /**
+     * Retreive a language for edition
+     *
+     * @param string $language
+     * @return Model\TermData
+     */
+    public function editLanguage($language = '')
+    {
+        if (array_key_exists('lang_' . $language, $this->container)) {
+            return $this->container['lang_' . $language];
+        }
+
+        return null;
     }
 
     /**
