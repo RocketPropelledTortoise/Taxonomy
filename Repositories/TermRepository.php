@@ -1,5 +1,6 @@
 <?php namespace Rocket\Taxonomy\Repositories;
 
+use Illuminate\Cache\Repository as CacheRepository;
 use Rocket\Taxonomy\Facade as T;
 use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermData;
@@ -10,7 +11,7 @@ class TermRepository implements TermRepositoryInterface
 {
 
     /**
-     * @var \Illuminate\Cache\Repository
+     * @var CacheRepository
      */
     protected $cache;
 
@@ -21,7 +22,7 @@ class TermRepository implements TermRepositoryInterface
      */
     protected static $cacheKey = 'Rocket::Taxonomy::Term::';
 
-    public function __construct(\Illuminate\Cache\Repository $cache)
+    public function __construct(CacheRepository $cache)
     {
         $this->cache = $cache;
     }
