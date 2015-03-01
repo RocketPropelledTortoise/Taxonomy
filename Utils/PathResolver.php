@@ -1,4 +1,4 @@
-<?php namespace Rocket\Taxonomy;
+<?php namespace Rocket\Taxonomy\Utils;
 
 use CentralDesktop\Graph\Edge\DirectedEdge;
 use CentralDesktop\Graph\Graph\DirectedGraph;

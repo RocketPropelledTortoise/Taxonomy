@@ -197,9 +197,9 @@ class Taxonomy
      * @param $term_id
      * @return array
      */
-    public function getAncestry($term_id)
+    public function getAncestryGraph($term_id)
     {
-        return $this->termHierarchyRepository->getAncestry($term_id);
+        return $this->termHierarchyRepository->getAncestryGraph($term_id);
     }
 
     /**
@@ -207,9 +207,28 @@ class Taxonomy
      * @param $term_id
      * @return array
      */
-    public function getDescent($term_id)
+    public function getDescentGraph($term_id)
     {
-        return $this->termHierarchyRepository->getDescent($term_id);
+        return $this->termHierarchyRepository->getDescentGraph($term_id);
+    }
+
+    /**
+     * @param integer $term_id
+     * @param integer $parent_id
+     * @return bool
+     */
+    public function addParent($term_id, $parent_id)
+    {
+        return $this->termHierarchyRepository->addParent($term_id, $parent_id);
+    }
+
+    /**
+     * @param integer $term_id
+     * @return bool
+     */
+    public function unsetParents($term_id)
+    {
+        return $this->termHierarchyRepository->unsetParents($term_id);
     }
 
     /**

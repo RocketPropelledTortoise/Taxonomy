@@ -12,16 +12,16 @@ use CentralDesktop\Graph\Graph\DirectedGraph;
 interface TermHierarchyRepositoryInterface
 {
     /**
-     * Get all parents
-     * @return DirectedGraph|null
+     * Get all ancestors
+     * @return array
      */
     public function getAncestry($id);
 
     /**
-     * Get all parents
-     * @return DirectedGraph|null
+     * Get all ancestors in a graph
+     * @return array Vertex, DirectedGraph
      */
-    public function getDescent($id);
+    public function getAncestryGraph($id);
 
     /**
      * @return array
@@ -29,7 +29,32 @@ interface TermHierarchyRepositoryInterface
     public function getAncestryPaths($id);
 
     /**
+     * Get all descendants
+     * @return array
+     */
+    public function getDescent($id);
+
+    /**
+     * Get all descendants in a graph
+     * @return array Vertex, DirectedGraph
+     */
+    public function getDescentGraph($id);
+
+    /**
      * @return array
      */
     public function getDescentPaths($id);
+
+    /**
+     * @param integer $term_id
+     * @param integer $parent_id
+     * @return bool
+     */
+    public function addParent($term_id, $parent_id);
+
+    /**
+     * @param integer $term_id
+     * @return bool
+     */
+    public function unsetParents($term_id);
 }

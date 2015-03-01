@@ -181,6 +181,34 @@ class Term implements ArrayAccess
         return false;
     }
 
+    public function addParent($parent_id)
+    {
+        //todo : check if we can do that (hierarchy type)
+
+        return T::addParent($this->id(), $parent_id);
+    }
+
+    public function addParents(array $parents)
+    {
+        foreach ($parents as $parent_id) {
+            $this->addParent($parent_id);
+        }
+    }
+
+    public function setParent($parent_id)
+    {
+        T::unsetParents($this->id());
+
+        $this->addParent($parent_id);
+    }
+
+    public function setParents(array $parents)
+    {
+        T::unsetParents($this->id());
+
+        $this->addParents($parents);
+    }
+
     /**
      * Retrieve a language for edition
      *

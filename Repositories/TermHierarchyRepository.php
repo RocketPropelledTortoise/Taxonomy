@@ -4,7 +4,9 @@ use CentralDesktop\Graph\Graph\DirectedGraph;
 use CentralDesktop\Graph\Vertex;
 use Illuminate\Support\Facades\DB;
 use Rocket\Taxonomy\Model\Hierarchy;
-use Rocket\Taxonomy\PathResolver;
+use Rocket\Taxonomy\Utils\PathResolver;
+use Rocket\Taxonomy\Utils\CommonTableExpressionQuery;
+use Rocket\Taxonomy\Utils\RecursiveQuery;
 
 /**
  * Create paths from a term all the way to all the parents.
@@ -35,61 +37,95 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     }
 
     /**
-     * Get the SQL Query to run on the database to get the recursive content
-     *
-     * @return string
+     * @param integer $term_id
+     * @param integer $parent_id
+     * @return bool
      */
-    protected function getQuery($direction)
-    {
-        //TODO :: also support real "WITH RECURSIVE" syntax
-        //TODO :: also add fallback to simple recursive calls
-
-        $hierarchy_table = (new Hierarchy)->getTable();
-        $temp_name = 'name_tree';
-
-        $recursive_base = "select `c`.`term_id`, `c`.`parent_id` from `$hierarchy_table` as `c`";
-
-        if ($direction == 'ancestry') {
-            $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `term_id` = :id";
-            $recursive = "$recursive_base join `$temp_name` as `p` on `p`.`parent_id` = `c`.`term_id`";
-        } else {
-            $initial = "select `term_id`, `parent_id` from `$hierarchy_table` where `parent_id` = :id";
-            $recursive = "$recursive_base join `$temp_name` as `p` on `c`.`parent_id` = `p`.`term_id`";
-        }
-
-        $final = "select distinct * from `$temp_name`";
-
-
-        return "Call WITH_EMULATOR('$temp_name', '$initial', '$recursive', '$final', 0, 'ENGINE=MEMORY');";
+    public function addParent($term_id, $parent_id) {
+        return Hierarchy::insert(['term_id' => $term_id, 'parent_id' => $parent_id]);
     }
 
     /**
-     * Get all parents recursively from database
+     * @param integer $term_id
+     * @return bool
+     */
+    public function unsetParents($term_id) {
+        return Hierarchy::where('term_id', $term_id)->delete();
+    }
+
+    protected function supportsCommonTableExpressionQuery()
+    {
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver == 'mysql') {
+            return true;
+        }
+
+        if ($driver == 'sqlite' && \SQLite3::version()['versionNumber'] >= 3008003) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return \Rocket\Taxonomy\Utils\RecursiveQueryInterface
+     */
+    protected function getRecursiveRetriever()
+    {
+        if ($this->supportsCommonTableExpressionQuery()) {
+            return new CommonTableExpressionQuery();
+        }
+
+        return new RecursiveQuery();
+    }
+
+    /**
+     * Get the hierarchy cache key
+     *
+     * @param string $direction
+     * @param integer $id
+     * @return string
+     */
+    protected function getCacheKey($direction, $id)
+    {
+        return "Rocket::Taxonomy::TermHierarchy::$direction::$id";
+    }
+
+    /**
+     * Get all parents recursively
      *
      * @param int $id
-     * @param string $direction
      * @return array
      */
-    protected function getRawData($id, $direction)
+    public function getAncestry($id)
     {
-        return $this->cache->remember(
-            "Rocket::Taxonomy::TermHierarchy::$direction::$id",
-            2,
-            function () use ($id, $direction) {
-                $raw_query = $this->getQuery($direction);
-                $query = str_replace(':id', $id, $raw_query);
+        $key = $this->getCacheKey("ancestry", $id);
+        if ($results = $this->cache->get($key)) {
+            return $results;
+        }
 
-                $start = microtime(true);
+        $this->cache->add($key, $results = $this->getRecursiveRetriever()->getAncestry($id), 2);
 
-                //does not work as a prepared statement; we have to execute it directly
-                $results = DB::getReadPdo()->query($query)->fetchAll(\PDO::FETCH_OBJ);
+        return $results;
+    }
 
-                //we can't run it through laravel but the best is still to store the results
-                DB::logQuery($raw_query, [$id], round((microtime(true) - $start) * 1000, 2));
+    /**
+     * Get all childs recursively
+     *
+     * @param integer $id
+     * @return array
+     */
+    public function getDescent($id)
+    {
+        $key = $this->getCacheKey("descent", $id);
+        if ($results = $this->cache->get($key)) {
+            return $results;
+        }
 
-                return $results;
-            }
-        );
+        $this->cache->add($key, $results = $this->getRecursiveRetriever()->getDescent($id), 2);
+
+        return $results;
     }
 
     protected function prepareVertices($data)
@@ -112,9 +148,9 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      *
      * @return array Vertex, DirectedGraph
      */
-    public function getAncestry($id)
+    public function getAncestryGraph($id)
     {
-        $data = $this->getRawData($id, 'ancestry');
+        $data = $this->getAncestry($id);
 
         if (empty($data)) {
             return [null, null];
@@ -142,9 +178,9 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      *
      * @return array Vertex, DirectedGraph
      */
-    public function getDescent($id)
+    public function getDescentGraph($id)
     {
-        $data = $this->getRawData($id, 'descent');
+        $data = $this->getDescent($id);
 
         if (empty($data)) {
             return [null, null];
@@ -174,7 +210,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      */
     public function getAncestryPaths($id)
     {
-        list($start_vertex, $graph) = $this->getAncestry($id);
+        list($start_vertex, $graph) = $this->getAncestryGraph($id);
 
         if (!$graph) {
             return [];
@@ -191,7 +227,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      */
     public function getDescentPaths($id)
     {
-        list($start_vertex, $graph) = $this->getDescent($id);
+        list($start_vertex, $graph) = $this->getDescentGraph($id);
 
         if (!$graph) {
             return [];
