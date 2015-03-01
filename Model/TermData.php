@@ -1,8 +1,9 @@
 <?php namespace Rocket\Taxonomy\Model;
 
+use Illuminate\Database\Eloquent\Model;
 use Rocket\Taxonomy\Facade as T;
 
-class TermData extends \Eloquent
+class TermData extends Model
 {
     /**
      * {@inheritdoc}

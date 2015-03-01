@@ -1,6 +1,8 @@
 <?php namespace Rocket\Taxonomy\Model;
 
-class Vocabulary extends \Eloquent
+use Illuminate\Database\Eloquent\Model;
+
+class Vocabulary extends Model
 {
     /**
      * {@inheritdoc}

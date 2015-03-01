@@ -1,6 +1,8 @@
 <?php namespace Rocket\Taxonomy\Model;
 
-class Hierarchy extends \Eloquent
+use Illuminate\Database\Eloquent\Model;
+
+class Hierarchy extends Model
 {
     /**
      * {@inheritdoc}

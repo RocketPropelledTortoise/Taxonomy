@@ -2,7 +2,7 @@
 
 use CentralDesktop\Graph\Graph\DirectedGraph;
 use CentralDesktop\Graph\Vertex;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Rocket\Taxonomy\Model\Hierarchy;
 use Rocket\Taxonomy\PathResolver;
 
