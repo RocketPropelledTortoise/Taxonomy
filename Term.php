@@ -254,6 +254,7 @@ class Term implements ArrayAccess
 
     /**
      * echo Term - outputs the term in the current language
+     *
      * @return string
      */
     public function __toString()

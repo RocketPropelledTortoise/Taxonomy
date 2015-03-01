@@ -50,7 +50,7 @@ class Taxonomy
     protected $termHierarchyRepository;
 
     /**
-     * Initialize the taxonomy, Loads all existing taxonomies
+     * Initialize the taxonomy, Loads all existing vocabularies
      */
     public function __construct(CacheRepository $cache, TermRep $termRepository, TermHieraRep $termHierarchyRepository)
     {
@@ -58,12 +58,12 @@ class Taxonomy
         $this->termHierarchyRepository = $termHierarchyRepository;
         $this->cache = $cache;
 
-        //get the list of taxonomies
+        // Get the list of vocabularies
         $vocs = $cache->remember('Rocket::Taxonomy::Vocabularies', 60 * 24 * 7, function() {
             return Vocabulary::all();
         });
 
-        //initialize default datas
+        // Initialize the search for terms
         foreach ($vocs as $v) {
             $this->vocabularyByName[$v->machine_name] = $this->vocabularyById[$v->id] = $v;
         }
@@ -138,7 +138,7 @@ class Taxonomy
     }
 
     /**
-     * Get a term from the cache, localized
+     * Get a term with all translations
      *
      * @param  integer $term_id
      * @return Term
@@ -155,6 +155,12 @@ class Taxonomy
         return $data;
     }
 
+    /**
+     * Remove a term from the cache
+     *
+     * @param integer $term_id
+     * @return bool
+     */
     public function uncacheTerm($term_id)
     {
         if (array_key_exists($term_id, $this->terms)) {

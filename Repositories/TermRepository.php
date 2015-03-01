@@ -14,6 +14,11 @@ class TermRepository implements TermRepositoryInterface
      */
     protected $cache;
 
+    /**
+     * The term cache key
+     *
+     * @var string
+     */
     protected static $cacheKey = 'Rocket::Taxonomy::Term::';
 
     public function __construct(\Illuminate\Cache\Repository $cache)
@@ -21,6 +26,9 @@ class TermRepository implements TermRepositoryInterface
         $this->cache = $cache;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTerm($term_id, $from_cache = true)
     {
         if (!$from_cache || !$data = $this->cache->get(self::$cacheKey . $term_id)) {
@@ -34,6 +42,9 @@ class TermRepository implements TermRepositoryInterface
         return new Term($data);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function uncacheTerm($term_id)
     {
         return $this->cache->forget(self::$cacheKey . $term_id);
@@ -41,6 +52,7 @@ class TermRepository implements TermRepositoryInterface
 
     /**
      * Puts the term in the cache and returns it for usage
+     *
      * @param  integer $term_id
      * @return array
      */

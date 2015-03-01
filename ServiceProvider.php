@@ -6,9 +6,7 @@
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
+     * {@inheritdoc}
      */
     protected $defer = true;
 
@@ -29,9 +27,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     }
 
     /**
-     * Get the services provided by the provider.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function provides()
     {

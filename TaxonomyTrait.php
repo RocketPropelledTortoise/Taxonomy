@@ -1,13 +1,23 @@
 <?php namespace Rocket\Taxonomy;
 
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Rocket\Taxonomy\Facade as T;
 use Rocket\Taxonomy\Model\TermContainer;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * This class is the link between a content and its taxonomies
+ *
+ * Including this trait in your model will enable it
+ * to add and remove taxonomies from any vocabulary
+ */
 trait TaxonomyTrait
 {
 
+    /**
+     * Declared by Eloquent Model
+     */
     abstract public function morphToMany(
         $related,
         $name,
@@ -16,10 +26,20 @@ trait TaxonomyTrait
         $otherKey = null,
         $inverse = false
     );
+
+    /**
+     * Declared by Eloquent Model
+     */
     abstract public function getTable();
+
+    /**
+     * Declared by Eloquent Model
+     */
     abstract public function getKey();
 
     /**
+     * The relation configuration
+     *
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function taxonomies()
@@ -31,14 +51,14 @@ trait TaxonomyTrait
     /**
      * Filter the model to return a subset of entries matching the term ID
      *
-     * @param object $query
-     * @param int $term_id
+     * @param Builder $query
+     * @param integer $term_id
      *
-     * @return void
+     * @return Builder
      */
-    public function scopeGetAllByTermId($query, $term_id)
+    public function scopeGetAllByTermId(Builder $query, $term_id)
     {
-        return $query->whereHas('taxonomies', function($q) use ($term_id) {
+        return $query->whereHas('taxonomies', function(Builder $q) use ($term_id) {
             $q->where('term_id', $term_id);
         });
     }
@@ -46,8 +66,8 @@ trait TaxonomyTrait
     /**
      * Get the terms from a content
      *
-     * @param  int|string $vocabulary_id
-     * @return array
+     * @param  integer|string $vocabulary_id
+     * @return Collection
      */
     public function getTerms($vocabulary_id)
     {
@@ -69,6 +89,11 @@ trait TaxonomyTrait
         return $results;
     }
 
+    /**
+     * Link a term to this content
+     *
+     * @param integer $term_id
+     */
     public function addTerm($term_id)
     {
         TermContainer::findOrFail($term_id);
@@ -86,8 +111,8 @@ trait TaxonomyTrait
     /**
      * Set the terms to a content, removes the old ones (only for one vocabulary if specified)
      *
-     * @param array <int> $terms
-     * @param integer $vocabulary_id
+     * @param array<integer> $terms
+     * @param integer|string $vocabulary_id
      */
     public function setTerms($terms, $vocabulary_id = null)
     {
@@ -101,7 +126,8 @@ trait TaxonomyTrait
     /**
      * Removes terms specified by a vocabulary, or all
      *
-     * @param integer $vocabulary_id
+     * @param integer|string $vocabulary_id
+     * @return bool
      */
     public function removeTerms($vocabulary_id = null)
     {
@@ -119,7 +145,8 @@ trait TaxonomyTrait
     }
 
     /**
-     * Cache all terms of a content (only id's)
+     * Cache all terms of a content (only ids)
+     *
      * @return array
      */
     private function cacheTermsForContent()
@@ -144,6 +171,11 @@ trait TaxonomyTrait
         return $results;
     }
 
+    /**
+     * Get the cache key for this content
+     *
+     * @return string
+     */
     private function getTaxonomyCacheKey()
     {
         return 'Rocket::Taxonomy::Related::' . $this->getTable() . '::' . $this->getKey();
@@ -152,7 +184,7 @@ trait TaxonomyTrait
     /**
      * Get a new plain query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder
      */
     private function getTaxonomyQuery()
     {
