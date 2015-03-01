@@ -1,6 +1,7 @@
 <?php namespace Rocket\Taxonomy;
 
 use ArrayAccess;
+use Rocket\Taxonomy\Exception\UndefinedLanguageException;
 use Rocket\Translation\I18NFacade as I18N;
 use Rocket\Taxonomy\Facade as T;
 
@@ -181,18 +182,19 @@ class Term implements ArrayAccess
     }
 
     /**
-     * Retreive a language for edition
+     * Retrieve a language for edition
      *
      * @param string $language
      * @return Model\TermData
+     * @throws UndefinedLanguageException
      */
     public function editLanguage($language = '')
     {
-        if (array_key_exists('lang_' . $language, $this->container)) {
-            return $this->container['lang_' . $language];
+        if (!array_key_exists('lang_' . $language, $this->container)) {
+            throw new UndefinedLanguageException;
         }
 
-        return null;
+        return $this->container['lang_' . $language];
     }
 
     /**
