@@ -4,8 +4,8 @@ use CentralDesktop\Graph\Graph\DirectedGraph;
 use CentralDesktop\Graph\Vertex;
 use Illuminate\Support\Facades\DB;
 use Rocket\Taxonomy\Model\Hierarchy;
-use Rocket\Taxonomy\Utils\PathResolver;
 use Rocket\Taxonomy\Utils\CommonTableExpressionQuery;
+use Rocket\Taxonomy\Utils\PathResolver;
 use Rocket\Taxonomy\Utils\RecursiveQuery;
 
 /**

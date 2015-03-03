@@ -2,8 +2,8 @@
 
 use ArrayAccess;
 use Rocket\Taxonomy\Exception\UndefinedLanguageException;
-use Rocket\Translation\I18NFacade as I18N;
 use Rocket\Taxonomy\Facade as T;
+use Rocket\Translation\I18NFacade as I18N;
 
 /**
  * Taxonomy term

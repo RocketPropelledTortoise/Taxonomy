@@ -1,10 +1,10 @@
 <?php namespace Rocket\Taxonomy;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Rocket\Taxonomy\Facade as T;
 use Rocket\Taxonomy\Model\TermContainer;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * This class is the link between a content and its taxonomies
