@@ -152,7 +152,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     {
         $data = $this->getAncestry($id);
 
-        if (empty($data)) {
+        if (count($data) == 0) {
             return [null, null];
         }
 
@@ -182,7 +182,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     {
         $data = $this->getDescent($id);
 
-        if (empty($data)) {
+        if (count($data) == 0) {
             return [null, null];
         }
 
