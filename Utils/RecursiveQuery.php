@@ -5,7 +5,8 @@ use Illuminate\Support\Arr;
 use Rocket\Taxonomy\Model\Hierarchy;
 use Illuminate\Support\Collection;
 
-class RecursiveQuery implements RecursiveQueryInterface {
+class RecursiveQuery implements RecursiveQueryInterface
+{
 
     protected $hierarchyTable;
 
@@ -14,7 +15,8 @@ class RecursiveQuery implements RecursiveQueryInterface {
         $this->hierarchyTable = (new Hierarchy)->getTable();
     }
 
-    public function getAncestry($id) {
+    public function getAncestry($id)
+    {
         $all_results = new Collection(DB::select($this->getAncestryInitialQuery(), [':id' => $id]));
 
         if (count($all_results)) {
@@ -38,7 +40,8 @@ class RecursiveQuery implements RecursiveQueryInterface {
         }
     }
 
-    public function getDescent($id) {
+    public function getDescent($id)
+    {
 
         $all_results = new Collection(DB::select($this->getDescentInitialQuery(), [':id' => $id]));
 

@@ -1,6 +1,7 @@
 <?php namespace Rocket\Taxonomy\Utils;
 
-interface RecursiveQueryInterface {
+interface RecursiveQueryInterface
+{
     public function getAncestry($ids);
 
     public function getDescent($ids);

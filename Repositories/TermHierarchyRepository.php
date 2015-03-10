@@ -41,7 +41,8 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      * @param integer $parent_id
      * @return bool
      */
-    public function addParent($term_id, $parent_id) {
+    public function addParent($term_id, $parent_id)
+    {
         return Hierarchy::insert(['term_id' => $term_id, 'parent_id' => $parent_id]);
     }
 
@@ -49,7 +50,8 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      * @param integer $term_id
      * @return bool
      */
-    public function unsetParents($term_id) {
+    public function unsetParents($term_id)
+    {
         return Hierarchy::where('term_id', $term_id)->delete();
     }
 

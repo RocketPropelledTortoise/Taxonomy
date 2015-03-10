@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\DB;
 
-class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQueryInterface {
+class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQueryInterface
+{
 
     protected function runQuery($raw_query, $id)
     {
