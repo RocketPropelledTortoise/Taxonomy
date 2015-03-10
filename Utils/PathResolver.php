@@ -47,7 +47,8 @@ class PathResolver
     protected function getPathsRecursion(Vertex $start, DirectedEdge $edge)
     {
         // We don't want to visit the same vertex twice within a single path. (avoid loops)
-        if (array_key_exists($start->get_data(), $this->current_path)) {
+        if (in_array($start->get_data(), $this->current_path)) {
+            $this->paths[] = array_reverse($this->current_path);
             return;
         }
 
@@ -59,7 +60,7 @@ class PathResolver
         }
 
         /**
-         * @var $edge Edge\DirectedEdge
+         * @var $edge DirectedEdge
          */
         foreach ($start->incoming_edges as $edge) {
             $this->getPathsRecursion($edge->get_source(), $edge);
