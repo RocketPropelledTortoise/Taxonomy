@@ -4,6 +4,7 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Model\Vocabulary;
+use Rocket\Taxonomy\Model\Hierarchy;
 use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface as TermHieraRep;
 use Rocket\Taxonomy\Repositories\TermRepositoryInterface as TermRep;
 use Rocket\Translation\I18NFacade as I18N;
@@ -219,6 +220,21 @@ class Taxonomy
      */
     public function addParent($term_id, $parent_id)
     {
+        $vocabulary = (new Vocabulary())->getTable();
+        $term = (new TermContainer())->getTable();
+        $v = Vocabulary::select('hierarchy', 'name')
+            ->where("$term.id", $term_id)
+            ->join($term, "vocabulary_id", '=', "$vocabulary.id")
+            ->first();
+
+        if ($v->hierarchy == 0) {
+            throw new \RuntimeException("Cannot add a parent in vocabulary '$v->name'");
+        }
+
+        if ($v->hierarchy == 1 && Hierarchy::where('term_id', $term_id)->count() > 0) {
+            throw new \RuntimeException("Cannot have more than one parent in vocabulary '$v->name'");
+        }
+
         return $this->termHierarchyRepository->addParent($term_id, $parent_id);
     }
 

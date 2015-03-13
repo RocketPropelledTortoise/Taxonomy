@@ -183,8 +183,6 @@ class Term implements ArrayAccess
 
     public function addParent($parent_id)
     {
-        //todo : check if we can do that (hierarchy type)
-
         return T::addParent($this->id(), $parent_id);
     }
 
