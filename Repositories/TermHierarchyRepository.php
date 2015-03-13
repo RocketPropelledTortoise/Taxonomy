@@ -134,6 +134,11 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     {
         $vertices = [];
         foreach ($data as $content) {
+            // identifiers must be strings or SplObjectStorage::contains fails
+            // seems to impact only PHP 5.6
+            $content->term_id = "$content->term_id";
+            $content->parent_id = "$content->parent_id";
+
             if (!array_key_exists($content->term_id, $vertices)) {
                 $vertices[$content->term_id] = new Vertex($content->term_id);
             }
