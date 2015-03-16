@@ -374,7 +374,7 @@ class Taxonomy
             'title' => $title,
         ];
         $term->translations()->save(new TermData($translation));
-        
+
         return $term->id;
     }
 
