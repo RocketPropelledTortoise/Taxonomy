@@ -1,10 +1,10 @@
 <?php namespace Rocket\Taxonomy;
 
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Rocket\Taxonomy\Model\Hierarchy;
 use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Model\Vocabulary;
-use Rocket\Taxonomy\Model\Hierarchy;
 use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface as TermHieraRep;
 use Rocket\Taxonomy\Repositories\TermRepositoryInterface as TermRep;
 use Rocket\Translation\I18NFacade as I18N;
@@ -73,7 +73,7 @@ class Taxonomy
     /**
      * Is this vocabulary translatable ?
      *
-     * @param string|int $vid
+     * @param integer|string $vid
      * @return boolean
      */
     public function isTranslatable($vid)
@@ -116,7 +116,7 @@ class Taxonomy
      *     Taxonomy::vocabulary('tags');
      *     returns 1
      *
-     * @param $key
+     * @param integer|string $key
      * @return mixed
      */
     public function vocabulary($key)
@@ -174,7 +174,7 @@ class Taxonomy
     /**
      * Get all paths for a term
      *
-     * @param int $term_id
+     * @param integer $term_id
      * @return array<array<int>>
      */
     public function getAncestryPaths($term_id)
@@ -185,7 +185,7 @@ class Taxonomy
     /**
      * Get all paths for a term
      *
-     * @param int $term_id
+     * @param integer $term_id
      * @return array<array<int>>
      */
     public function getDescentPaths($term_id)
@@ -195,7 +195,7 @@ class Taxonomy
 
     /**
      * Get the complete graph
-     * @param $term_id
+     * @param integer $term_id
      * @return array
      */
     public function getAncestryGraph($term_id)
@@ -205,7 +205,7 @@ class Taxonomy
 
     /**
      * Get the complete graph
-     * @param $term_id
+     * @param integer $term_id
      * @return array
      */
     public function getDescentGraph($term_id)
@@ -214,11 +214,41 @@ class Taxonomy
     }
 
     /**
+     * Add one parent to a term
+     *
      * @param integer $term_id
      * @param integer $parent_id
-     * @return bool
      */
     public function addParent($term_id, $parent_id)
+    {
+        $this->testCanAddParents($term_id, 1);
+
+        $this->termHierarchyRepository->addParent($term_id, $parent_id);
+    }
+
+    /**
+     * Add a list of parents to a term
+     *
+     * @param integer $term_id
+     * @param array<integer> $parent_ids
+     */
+    public function addParents($term_id, array $parent_ids)
+    {
+        $this->testCanAddParents($term_id, count($parent_ids));
+
+        foreach ($parent_ids as $id) {
+            $this->termHierarchyRepository->addParent($term_id, $id);
+        }
+    }
+
+    /**
+     * Test if the term can have more parents
+     *
+     * @param integer $term_id
+     * @param integer $count
+     * @throws \RuntimeException
+     */
+    protected function testCanAddParents($term_id, $count)
     {
         $vocabulary = (new Vocabulary())->getTable();
         $term = (new TermContainer())->getTable();
@@ -231,11 +261,10 @@ class Taxonomy
             throw new \RuntimeException("Cannot add a parent in vocabulary '$v->name'");
         }
 
-        if ($v->hierarchy == 1 && Hierarchy::where('term_id', $term_id)->count() > 0) {
+        if (($v->hierarchy == 1 && Hierarchy::where('term_id', $term_id)->count() > 0)
+            || ($v->hierarchy == 1 && $count > 1)) {
             throw new \RuntimeException("Cannot have more than one parent in vocabulary '$v->name'");
         }
-
-        return $this->termHierarchyRepository->addParent($term_id, $parent_id);
     }
 
     /**
@@ -250,7 +279,7 @@ class Taxonomy
     /**
      * Get all the terms of a vocabulary
      *
-     * @param  integer $vocabulary_id
+     * @param integer $vocabulary_id
      * @return array
      */
     public function getTermsForVocabulary($vocabulary_id)
@@ -277,8 +306,8 @@ class Taxonomy
      * Search a specific term, if it doesn't exist, returns false
      *
      * @param  string $term
-     * @param  int $vocabulary_id
-     * @param  int $language_id
+     * @param  integer $vocabulary_id
+     * @param  integer $language_id
      * @param  array $exclude
      * @return int|null
      */
@@ -308,10 +337,10 @@ class Taxonomy
      * Returns the id of a term, if it doesn't exist, creates it.
      *
      * @param  string $title
-     * @param  int $vocabulary_id
-     * @param  int $language_id
-     * @param  int $type
-     * @return bool|int
+     * @param  integer $vocabulary_id
+     * @param  integer $language_id
+     * @param  integer $type
+     * @return bool|integer
      */
     public function getTermId($title, $vocabulary_id, $language_id = null, $type = 0)
     {
@@ -345,15 +374,14 @@ class Taxonomy
             'title' => $title,
         ];
         $term->translations()->save(new TermData($translation));
-
-        //return it
+        
         return $term->id;
     }
 
     /**
      * Adds one or more tags and returns an array of id's
      *
-     * @param  array $taxonomies
+     * @param array $taxonomies
      * @return array
      */
     public function getTermIds($taxonomies)

@@ -138,7 +138,8 @@ class Term implements ArrayAccess
     /**
      * Return the textual version of the term
      *
-     * @param  string $language
+     * @param string $key
+     * @param string $language
      * @return string
      */
     public function string($key, $language = '')
@@ -181,18 +182,32 @@ class Term implements ArrayAccess
         return false;
     }
 
+    /**
+     * Add one parent to a term
+     *
+     * @param int $parent_id
+     * @return mixed
+     */
     public function addParent($parent_id)
     {
         return T::addParent($this->id(), $parent_id);
     }
 
-    public function addParents(array $parents)
+    /**
+     * Add a list of parents to a term
+     *
+     * @param array<int> $parent_ids
+     */
+    public function addParents(array $parent_ids)
     {
-        foreach ($parents as $parent_id) {
-            $this->addParent($parent_id);
-        }
+        return T::addParents($this->id(), $parent_ids);
     }
 
+    /**
+     * Replace the parents on a term by this one
+     *
+     * @param int $parent_id
+     */
     public function setParent($parent_id)
     {
         T::unsetParents($this->id());
@@ -200,11 +215,16 @@ class Term implements ArrayAccess
         $this->addParent($parent_id);
     }
 
-    public function setParents(array $parents)
+    /**
+     * Replace the parents by this list
+     *
+     * @param array<int> $parent_ids
+     */
+    public function setParents(array $parent_ids)
     {
         T::unsetParents($this->id());
 
-        $this->addParents($parents);
+        $this->addParents($parent_ids);
     }
 
     /**
