@@ -7,7 +7,7 @@ use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Model\Vocabulary;
 use Rocket\Taxonomy\Repositories\TermHierarchyRepositoryInterface as TermHieraRep;
 use Rocket\Taxonomy\Repositories\TermRepositoryInterface as TermRep;
-use Rocket\Translation\I18NFacade as I18N;
+use Rocket\Translation\Support\Laravel5\Facade as I18N;
 
 /**
  * Class Taxonomy

@@ -2,8 +2,8 @@
 
 use ArrayAccess;
 use Rocket\Taxonomy\Exception\UndefinedLanguageException;
-use Rocket\Taxonomy\Facade as T;
-use Rocket\Translation\I18NFacade as I18N;
+use Rocket\Taxonomy\Support\Laravel5\Facade as T;
+use Rocket\Translation\Support\Laravel5\Facade as I18N;
 
 /**
  * Taxonomy term

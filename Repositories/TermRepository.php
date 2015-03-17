@@ -1,11 +1,11 @@
 <?php namespace Rocket\Taxonomy\Repositories;
 
 use Illuminate\Cache\Repository as CacheRepository;
-use Rocket\Taxonomy\Facade as T;
+use Rocket\Taxonomy\Support\Laravel5\Facade as T;
 use Rocket\Taxonomy\Model\TermContainer;
 use Rocket\Taxonomy\Model\TermData;
 use Rocket\Taxonomy\Term;
-use Rocket\Translation\I18NFacade as I18N;
+use Rocket\Translation\Support\Laravel5\Facade as I18N;
 
 class TermRepository implements TermRepositoryInterface
 {

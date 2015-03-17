@@ -1,7 +1,7 @@
 <?php namespace Rocket\Taxonomy\Model;
 
 use Illuminate\Database\Eloquent\Model;
-use Rocket\Taxonomy\Facade as T;
+use Rocket\Taxonomy\Support\Laravel5\Facade as T;
 
 class TermData extends Model
 {

@@ -1,4 +1,4 @@
-<?php namespace Rocket\Taxonomy;
+<?php namespace Rocket\Taxonomy\Support\Laravel5;
 
 /**
  * Class Taxonomy
