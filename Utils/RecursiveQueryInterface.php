@@ -2,7 +2,19 @@
 
 interface RecursiveQueryInterface
 {
-    public function getAncestry($ids);
+    /**
+     * Get all ancestors of a term
+     *
+     * @param $id
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAncestry($id);
 
-    public function getDescent($ids);
+    /**
+     * Get all descendents of a term
+     *
+     * @param $id
+     * @return \Illuminate\Support\Collection
+     */
+    public function getDescent($id);
 }

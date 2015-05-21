@@ -98,7 +98,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      * Get all parents recursively
      *
      * @param int $id
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function getAncestry($id)
     {
@@ -116,7 +116,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      * Get all childs recursively
      *
      * @param integer $id
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function getDescent($id)
     {

@@ -13,7 +13,7 @@ interface TermHierarchyRepositoryInterface
 {
     /**
      * Get all ancestors
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function getAncestry($id);
 
@@ -30,7 +30,7 @@ interface TermHierarchyRepositoryInterface
 
     /**
      * Get all descendants
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function getDescent($id);
 

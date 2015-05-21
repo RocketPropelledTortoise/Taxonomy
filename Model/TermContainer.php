@@ -2,6 +2,13 @@
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * The main term container
+ *
+ * @property integer $id
+ * @property integer $vocabulary_id
+ * @property integer $type
+ */
 class TermContainer extends Model
 {
     /**

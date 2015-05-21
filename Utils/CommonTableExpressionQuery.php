@@ -2,9 +2,23 @@
 
 use Illuminate\Support\Facades\DB;
 
+/**
+ * This class will use the Common Table Expression
+ * technique to make a recursive request on the database.
+ * On mysql it will fallback to a stored procedure doing the same.
+ *
+ * The choice of a Common Table Expression or a standard query is done automatically
+ */
 class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQueryInterface
 {
-
+    /**
+     * Execute the query with the current PDO connection.
+     * Will log the time taken manually
+     *
+     * @param string $raw_query
+     * @param integer $id
+     * @return |Illuminate\Support\Collection
+     */
     protected function runQuery($raw_query, $id)
     {
         $query = str_replace(':id', $id, $raw_query);
@@ -34,6 +48,9 @@ class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQuer
         return "WITH RECURSIVE $tmp_tbl AS ($initial UNION ALL $recursive) $final;";
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAncestry($id)
     {
         $tbl = $this->hierarchyTable;
@@ -44,6 +61,9 @@ class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQuer
         return $this->runQuery($raw_query, $id);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDescent($id)
     {
         $tbl = $this->hierarchyTable;

@@ -3,6 +3,15 @@
 use Illuminate\Database\Eloquent\Model;
 use Rocket\Taxonomy\Support\Laravel5\Facade as T;
 
+/**
+ * The translation Data for a term
+ *
+ * @property integer $id
+ * @property integer $term_id
+ * @property integer $language_id
+ * @property string $title
+ * @property string $description
+ */
 class TermData extends Model
 {
     /**
@@ -39,7 +48,7 @@ class TermData extends Model
      */
     public function save(array $options = array())
     {
-        if ($this->translated == false) {
+        if ($this->translated === false) {
             $this->translated = true;
         }
 

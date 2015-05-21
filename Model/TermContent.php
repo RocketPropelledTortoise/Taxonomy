@@ -2,6 +2,13 @@
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Relations from a term to a content
+ *
+ * @property integer $term_id
+ * @property integer $relationable_id
+ * @property string $relationable_type
+ */
 class TermContent extends Model
 {
     /**

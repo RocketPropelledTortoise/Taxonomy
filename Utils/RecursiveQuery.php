@@ -5,9 +5,16 @@ use Illuminate\Support\Arr;
 use Rocket\Taxonomy\Model\Hierarchy;
 use Illuminate\Support\Collection;
 
+/**
+ * This Class handles recusive queries to retrieve
+ * parent-child relations for terms.
+ */
 class RecursiveQuery implements RecursiveQueryInterface
 {
 
+    /**
+     * @var string The table in which hierarchical data is stored
+     */
     protected $hierarchyTable;
 
     public function __construct()
@@ -15,6 +22,9 @@ class RecursiveQuery implements RecursiveQueryInterface
         $this->hierarchyTable = (new Hierarchy)->getTable();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAncestry($id)
     {
         $all_results = new Collection(DB::select($this->getAncestryInitialQuery(), [':id' => $id]));
@@ -40,16 +50,18 @@ class RecursiveQuery implements RecursiveQueryInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDescent($id)
     {
-
         $all_results = new Collection(DB::select($this->getDescentInitialQuery(), [':id' => $id]));
 
         if (count($all_results)) {
             $this->getRecursiveDescent($all_results, $all_results->lists('term_id'));
         }
 
-        return $all_results->toArray();
+        return $all_results;
     }
 
     protected function getDescentInitialQuery()

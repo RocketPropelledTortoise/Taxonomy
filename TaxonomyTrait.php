@@ -3,8 +3,8 @@
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Rocket\Taxonomy\Support\Laravel5\Facade as T;
 use Rocket\Taxonomy\Model\TermContainer;
+use Rocket\Taxonomy\Support\Laravel5\Facade as T;
 
 /**
  * This class is the link between a content and its taxonomies

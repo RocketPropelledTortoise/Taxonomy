@@ -100,7 +100,7 @@ class Taxonomy
             return 1;
         }
 
-        if ($language_id == null) {
+        if ($language_id === null) {
             return I18N::getCurrentId();
         }
 
@@ -356,7 +356,7 @@ class Taxonomy
         $language_id = $this->getLanguage($vocabulary_id, $language_id);
 
         $search = $this->searchTerm($title, $vocabulary_id, $language_id);
-        if ($search) {
+        if ($search !== null) {
             return $search;
         }
 
