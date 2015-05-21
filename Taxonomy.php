@@ -393,7 +393,7 @@ class Taxonomy
 
             foreach ($exploded as $term) {
                 $result = $this->getTermId($term, $vocabulary_id);
-                if ($result) {
+                if ($result !== null) {
                     $tags[] = $result;
                 }
             }

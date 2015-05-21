@@ -130,6 +130,10 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
         return $results;
     }
 
+    /**
+     * @param \Illuminate\Support\Collection $data
+     * @return array<Vertex>
+     */
     protected function prepareVertices($data)
     {
         $vertices = [];

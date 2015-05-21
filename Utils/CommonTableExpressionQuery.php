@@ -17,7 +17,7 @@ class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQuer
      *
      * @param string $raw_query
      * @param integer $id
-     * @return |Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function runQuery($raw_query, $id)
     {
