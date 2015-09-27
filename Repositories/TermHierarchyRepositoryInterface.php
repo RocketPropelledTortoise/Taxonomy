@@ -6,8 +6,6 @@ use CentralDesktop\Graph\Graph\DirectedGraph;
  * Create paths from a term all the way to all the parents.
  *
  * Everything is calculated upside down so that the DFS search for all paths is easy
- *
- * @package Rocket\Taxonomy
  */
 interface TermHierarchyRepositoryInterface
 {
@@ -46,14 +44,14 @@ interface TermHierarchyRepositoryInterface
     public function getDescentPaths($id);
 
     /**
-     * @param integer $term_id
-     * @param integer $parent_id
+     * @param int $term_id
+     * @param int $parent_id
      * @return bool
      */
     public function addParent($term_id, $parent_id);
 
     /**
-     * @param integer $term_id
+     * @param int $term_id
      * @return bool
      */
     public function unsetParents($term_id);

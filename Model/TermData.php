@@ -6,9 +6,9 @@ use Rocket\Taxonomy\Support\Laravel5\Facade as T;
 /**
  * The translation Data for a term
  *
- * @property integer $id
- * @property integer $term_id
- * @property integer $language_id
+ * @property int $id
+ * @property int $term_id
+ * @property int $language_id
  * @property string $title
  * @property string $description
  */
@@ -46,7 +46,7 @@ class TermData extends Model
     /**
      * {@inheritdoc}
      */
-    public function save(array $options = array())
+    public function save(array $options = [])
     {
         if ($this->translated === false) {
             $this->translated = true;

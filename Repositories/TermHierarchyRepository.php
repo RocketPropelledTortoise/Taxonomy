@@ -12,12 +12,9 @@ use Rocket\Taxonomy\Utils\RecursiveQuery;
  * Create paths from a term all the way to all the parents.
  *
  * Everything is calculated upside down so that the DFS search for all paths is easy
- *
- * @package Rocket\Taxonomy
  */
 class TermHierarchyRepository implements TermHierarchyRepositoryInterface
 {
-
     /**
      * @var array<Vertex> all Vertices (Current and parents)
      */
@@ -37,8 +34,8 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     }
 
     /**
-     * @param integer $term_id
-     * @param integer $parent_id
+     * @param int $term_id
+     * @param int $parent_id
      * @return bool
      */
     public function addParent($term_id, $parent_id)
@@ -47,7 +44,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     }
 
     /**
-     * @param integer $term_id
+     * @param int $term_id
      * @return bool
      */
     public function unsetParents($term_id)
@@ -86,7 +83,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      * Get the hierarchy cache key
      *
      * @param string $direction
-     * @param integer $id
+     * @param int $id
      * @return string
      */
     protected function getCacheKey($direction, $id)
@@ -102,7 +99,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
      */
     public function getAncestry($id)
     {
-        $key = $this->getCacheKey("ancestry", $id);
+        $key = $this->getCacheKey('ancestry', $id);
         if ($results = $this->cache->get($key)) {
             return $results;
         }
@@ -115,12 +112,12 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
     /**
      * Get all childs recursively
      *
-     * @param integer $id
+     * @param int $id
      * @return \Illuminate\Support\Collection
      */
     public function getDescent($id)
     {
-        $key = $this->getCacheKey("descent", $id);
+        $key = $this->getCacheKey('descent', $id);
         if ($results = $this->cache->get($key)) {
             return $results;
         }
@@ -151,6 +148,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
                 $vertices[$content->parent_id] = new Vertex($content->parent_id);
             }
         }
+
         return $vertices;
     }
 
@@ -228,6 +226,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
         }
 
         $resolver = new PathResolver($graph);
+
         return $resolver->resolvePaths($start_vertex);
     }
 
@@ -245,6 +244,7 @@ class TermHierarchyRepository implements TermHierarchyRepositoryInterface
         }
 
         $resolver = new PathResolver($graph);
+
         return $resolver->resolvePaths($start_vertex);
     }
 }

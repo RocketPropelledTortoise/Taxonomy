@@ -1,9 +1,9 @@
 <?php namespace Rocket\Taxonomy\Utils;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
-use Rocket\Taxonomy\Model\Hierarchy;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Rocket\Taxonomy\Model\Hierarchy;
 
 /**
  * This Class handles recusive queries to retrieve
@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
  */
 class RecursiveQuery implements RecursiveQueryInterface
 {
-
     /**
      * @var string The table in which hierarchical data is stored
      */

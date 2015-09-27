@@ -5,9 +5,9 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * The main term container
  *
- * @property integer $id
- * @property integer $vocabulary_id
- * @property integer $type
+ * @property int $id
+ * @property int $vocabulary_id
+ * @property int $type
  */
 class TermContainer extends Model
 {

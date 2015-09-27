@@ -60,7 +60,7 @@ class Taxonomy
         $this->cache = $cache;
 
         // Get the list of vocabularies
-        $vocs = $cache->remember('Rocket::Taxonomy::Vocabularies', 60 * 24 * 7, function() {
+        $vocs = $cache->remember('Rocket::Taxonomy::Vocabularies', 60 * 24 * 7, function () {
             return Vocabulary::all();
         });
 
@@ -73,8 +73,8 @@ class Taxonomy
     /**
      * Is this vocabulary translatable ?
      *
-     * @param integer|string $vid
-     * @return boolean
+     * @param int|string $vid
+     * @return bool
      */
     public function isTranslatable($vid)
     {
@@ -90,9 +90,9 @@ class Taxonomy
      *
      * This will return the language_id if the vocabulary is translated or 1 if it's not
      *
-     * @param integer|string $vocabulary_id
-     * @param integer $language_id
-     * @return integer|null
+     * @param int|string $vocabulary_id
+     * @param int $language_id
+     * @return int|null
      */
     public function getLanguage($vocabulary_id, $language_id = null)
     {
@@ -116,7 +116,7 @@ class Taxonomy
      *     Taxonomy::vocabulary('tags');
      *     returns 1
      *
-     * @param integer|string $key
+     * @param int|string $key
      * @return mixed
      */
     public function vocabulary($key)
@@ -141,7 +141,7 @@ class Taxonomy
     /**
      * Get a term with all translations
      *
-     * @param  integer $term_id
+     * @param  int $term_id
      * @return Term
      */
     public function getTerm($term_id, $from_cache = true)
@@ -159,7 +159,7 @@ class Taxonomy
     /**
      * Remove a term from the cache
      *
-     * @param integer $term_id
+     * @param int $term_id
      * @return bool
      */
     public function uncacheTerm($term_id)
@@ -174,7 +174,7 @@ class Taxonomy
     /**
      * Get all paths for a term
      *
-     * @param integer $term_id
+     * @param int $term_id
      * @return array<array<int>>
      */
     public function getAncestryPaths($term_id)
@@ -185,7 +185,7 @@ class Taxonomy
     /**
      * Get all paths for a term
      *
-     * @param integer $term_id
+     * @param int $term_id
      * @return array<array<int>>
      */
     public function getDescentPaths($term_id)
@@ -195,7 +195,7 @@ class Taxonomy
 
     /**
      * Get the complete graph
-     * @param integer $term_id
+     * @param int $term_id
      * @return array
      */
     public function getAncestryGraph($term_id)
@@ -205,7 +205,7 @@ class Taxonomy
 
     /**
      * Get the complete graph
-     * @param integer $term_id
+     * @param int $term_id
      * @return array
      */
     public function getDescentGraph($term_id)
@@ -216,8 +216,8 @@ class Taxonomy
     /**
      * Add one parent to a term
      *
-     * @param integer $term_id
-     * @param integer $parent_id
+     * @param int $term_id
+     * @param int $parent_id
      */
     public function addParent($term_id, $parent_id)
     {
@@ -229,7 +229,7 @@ class Taxonomy
     /**
      * Add a list of parents to a term
      *
-     * @param integer $term_id
+     * @param int $term_id
      * @param array<integer> $parent_ids
      */
     public function addParents($term_id, array $parent_ids)
@@ -244,8 +244,8 @@ class Taxonomy
     /**
      * Test if the term can have more parents
      *
-     * @param integer $term_id
-     * @param integer $count
+     * @param int $term_id
+     * @param int $count
      * @throws \RuntimeException
      */
     protected function testCanAddParents($term_id, $count)
@@ -254,7 +254,7 @@ class Taxonomy
         $term = (new TermContainer())->getTable();
         $v = Vocabulary::select('hierarchy', 'name')
             ->where("$term.id", $term_id)
-            ->join($term, "vocabulary_id", '=', "$vocabulary.id")
+            ->join($term, 'vocabulary_id', '=', "$vocabulary.id")
             ->first();
 
         if ($v->hierarchy == 0) {
@@ -268,7 +268,7 @@ class Taxonomy
     }
 
     /**
-     * @param integer $term_id
+     * @param int $term_id
      * @return bool
      */
     public function unsetParents($term_id)
@@ -279,7 +279,7 @@ class Taxonomy
     /**
      * Get all the terms of a vocabulary
      *
-     * @param integer $vocabulary_id
+     * @param int $vocabulary_id
      * @return array
      */
     public function getTermsForVocabulary($vocabulary_id)
@@ -306,8 +306,8 @@ class Taxonomy
      * Search a specific term, if it doesn't exist, returns false
      *
      * @param  string $term
-     * @param  integer $vocabulary_id
-     * @param  integer $language_id
+     * @param  int $vocabulary_id
+     * @param  int $language_id
      * @param  array $exclude
      * @return int|null
      */
@@ -317,7 +317,7 @@ class Taxonomy
 
         $term = trim($term);
         if ($term == '') {
-            return null;
+            return;
         }
 
         $query = TermData::select('taxonomy_terms.id')
@@ -337,10 +337,10 @@ class Taxonomy
      * Returns the id of a term, if it doesn't exist, creates it.
      *
      * @param  string $title
-     * @param  integer $vocabulary_id
-     * @param  integer $language_id
-     * @param  integer $type
-     * @return bool|integer
+     * @param  int $vocabulary_id
+     * @param  int $language_id
+     * @param  int $type
+     * @return bool|int
      */
     public function getTermId($title, $vocabulary_id, $language_id = null, $type = 0)
     {
@@ -389,7 +389,7 @@ class Taxonomy
         $tags = [];
         foreach ($taxonomies as $voc => $terms) {
             $vocabulary_id = $this->vocabulary($voc);
-            $exploded = is_array($terms)? $terms : explode(',', $terms);
+            $exploded = is_array($terms) ? $terms : explode(',', $terms);
 
             foreach ($exploded as $term) {
                 $result = $this->getTermId($term, $vocabulary_id);

@@ -16,7 +16,7 @@ class CommonTableExpressionQuery extends RecursiveQuery implements RecursiveQuer
      * Will log the time taken manually
      *
      * @param string $raw_query
-     * @param integer $id
+     * @param int $id
      * @return \Illuminate\Support\Collection
      */
     protected function runQuery($raw_query, $id)

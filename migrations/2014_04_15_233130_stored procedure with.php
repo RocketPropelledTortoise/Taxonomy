@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 /**
@@ -173,6 +172,6 @@ SQL;
         if (DB::connection()->getDriverName() != 'mysql') {
             return;
         }
-        DB::connection()->getPdo()->exec("DROP PROCEDURE IF EXISTS WITH_EMULATOR");
+        DB::connection()->getPdo()->exec('DROP PROCEDURE IF EXISTS WITH_EMULATOR');
     }
 }

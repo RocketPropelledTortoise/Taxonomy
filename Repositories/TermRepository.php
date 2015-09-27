@@ -9,7 +9,6 @@ use Rocket\Translation\Support\Laravel5\Facade as I18N;
 
 class TermRepository implements TermRepositoryInterface
 {
-
     /**
      * @var CacheRepository
      */
@@ -37,7 +36,7 @@ class TermRepository implements TermRepositoryInterface
         }
 
         if (!$data) {
-            return null;
+            return;
         }
 
         return new Term($data);
@@ -54,7 +53,7 @@ class TermRepository implements TermRepositoryInterface
     /**
      * Puts the term in the cache and returns it for usage
      *
-     * @param  integer $term_id
+     * @param  int $term_id
      * @return array
      */
     protected function cacheTerm($term_id)
@@ -65,18 +64,18 @@ class TermRepository implements TermRepositoryInterface
             return false;
         }
 
-        $translations = array();
+        $translations = [];
         foreach ($term->translations as $t) {
             $translations[$t->language_id] = $t;
         }
 
         $first = $term->translations[0];
 
-        $final_term = array(
+        $final_term = [
             'term_id' => $term_id,
             'vocabulary_id' => $term->vocabulary_id,
             'type' => $term->type,
-        );
+        ];
 
         if (T::isTranslatable($term->vocabulary_id)) {
             foreach (I18N::languages() as $lang => $l) {

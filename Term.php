@@ -37,8 +37,6 @@ use Rocket\Translation\Support\Laravel5\Facade as I18N;
  *
  *     $term->translated('en')
  *     -> true if it was translated in english
- *
- * @package Taxonomy
  */
 class Term implements ArrayAccess
 {
@@ -47,10 +45,10 @@ class Term implements ArrayAccess
      *
      * @var array
      */
-    private $container = array(
+    private $container = [
         'has_translations' => true,
-        'type' => 0
-    );
+        'type' => 0,
+    ];
 
     /**
      * Create the term
@@ -70,7 +68,7 @@ class Term implements ArrayAccess
      */
     public static function __set_state($data)
     {
-        return new Term($data['container']);
+        return new self($data['container']);
     }
 
     /**
@@ -231,8 +229,8 @@ class Term implements ArrayAccess
      * Retrieve a language for edition
      *
      * @param string $language
-     * @return Model\TermData
      * @throws UndefinedLanguageException
+     * @return Model\TermData
      */
     public function editLanguage($language = '')
     {
@@ -297,7 +295,7 @@ class Term implements ArrayAccess
             return $this->container['lang_' . I18N::getCurrent()][$offset];
         }
 
-        return null;
+        return;
     }
 
     /**

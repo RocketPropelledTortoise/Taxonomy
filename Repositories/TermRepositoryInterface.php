@@ -5,7 +5,7 @@ interface TermRepositoryInterface
     /**
      * Get a term with all translations
      *
-     * @param integer $term_id
+     * @param int $term_id
      * @return \Rocket\Taxonomy\Term
      */
     public function getTerm($term_id);
@@ -13,7 +13,7 @@ interface TermRepositoryInterface
     /**
      * Remove a term from the cache
      *
-     * @param integer $term_id
+     * @param int $term_id
      * @return bool
      */
     public function uncacheTerm($term_id);

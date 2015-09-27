@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Parent-child relations between terms
  *
- * @property integer $term_id
- * @property integer $parent_id
+ * @property int $term_id
+ * @property int $parent_id
  */
 class Hierarchy extends Model
 {

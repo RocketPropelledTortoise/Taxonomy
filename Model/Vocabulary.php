@@ -5,11 +5,11 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * The vocabularies in which you add terms
  *
- * @property integer $id
+ * @property int $id
  * @property string $machine_name
  * @property string $description
- * @property integer $hierarchy
- * @property boolean $translatable
+ * @property int $hierarchy
+ * @property bool $translatable
  */
 class Vocabulary extends Model
 {
@@ -30,6 +30,6 @@ class Vocabulary extends Model
 
     public function isTranslatable()
     {
-        return (bool)$this->translatable;
+        return (bool) $this->translatable;
     }
 }

@@ -14,7 +14,6 @@ use Rocket\Taxonomy\Support\Laravel5\Facade as T;
  */
 trait TaxonomyTrait
 {
-
     /**
      * Declared by Eloquent Model
      */
@@ -45,6 +44,7 @@ trait TaxonomyTrait
     public function taxonomies()
     {
         $class = 'Rocket\Taxonomy\Model\TermContainer';
+
         return $this->morphToMany($class, 'relationable', 'taxonomy_content', null, 'term_id');
     }
 
@@ -52,13 +52,13 @@ trait TaxonomyTrait
      * Filter the model to return a subset of entries matching the term ID
      *
      * @param Builder $query
-     * @param integer $term_id
+     * @param int $term_id
      *
      * @return Builder
      */
     public function scopeGetAllByTermId(Builder $query, $term_id)
     {
-        return $query->whereHas('taxonomies', function(Builder $q) use ($term_id) {
+        return $query->whereHas('taxonomies', function (Builder $q) use ($term_id) {
             $q->where('term_id', $term_id);
         });
     }
@@ -66,7 +66,7 @@ trait TaxonomyTrait
     /**
      * Get the terms from a content
      *
-     * @param  integer|string $vocabulary_id
+     * @param  int|string $vocabulary_id
      * @return Collection
      */
     public function getTerms($vocabulary_id)
@@ -92,7 +92,7 @@ trait TaxonomyTrait
     /**
      * Link a term to this content
      *
-     * @param integer $term_id
+     * @param int $term_id
      */
     public function addTerm($term_id)
     {
@@ -112,7 +112,7 @@ trait TaxonomyTrait
      * Set the terms to a content, removes the old ones (only for one vocabulary if specified)
      *
      * @param array<integer> $terms
-     * @param integer|string $vocabulary_id
+     * @param int|string $vocabulary_id
      */
     public function setTerms($terms, $vocabulary_id = null)
     {
@@ -126,7 +126,7 @@ trait TaxonomyTrait
     /**
      * Removes terms specified by a vocabulary, or all
      *
-     * @param integer|string $vocabulary_id
+     * @param int|string $vocabulary_id
      * @return bool
      */
     public function removeTerms($vocabulary_id = null)
@@ -139,7 +139,7 @@ trait TaxonomyTrait
             $vocabulary_id = T::vocabulary($vocabulary_id);
         }
 
-        return $this->getTaxonomyQuery()->whereIn('term_id', function($query) use ($vocabulary_id) {
+        return $this->getTaxonomyQuery()->whereIn('term_id', function ($query) use ($vocabulary_id) {
             $query->select('id')->where('vocabulary_id', $vocabulary_id)->from((new TermContainer)->getTable());
         })->delete();
     }
