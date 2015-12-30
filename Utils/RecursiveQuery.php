@@ -45,7 +45,7 @@ class RecursiveQuery implements RecursiveQueryInterface
         $all_results->merge($results = DB::table($this->hierarchyTable)->whereIn('term_id', $ids)->get());
 
         if (count($results)) {
-            $this->getRecursiveAncestry($all_results, Arr::fetch($results, 'parent_id'));
+            $this->getRecursiveAncestry($all_results, Arr::pluck($results, 'parent_id'));
         }
     }
 
@@ -73,7 +73,7 @@ class RecursiveQuery implements RecursiveQueryInterface
         $all_results->merge($results = DB::table($this->hierarchyTable)->whereIn('parent_id', $ids)->get());
 
         if (count($results)) {
-            $this->getRecursiveDescent($all_results, Arr::fetch($results, 'term_id'));
+            $this->getRecursiveDescent($all_results, Arr::pluck($results, 'term_id'));
         }
     }
 }
