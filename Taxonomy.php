@@ -330,7 +330,7 @@ class Taxonomy
             $query->whereNotIn('taxonomy_terms.id', $exclude);
         }
 
-        return $query->pluck('id');
+        return $query->value('id');
     }
 
     /**
