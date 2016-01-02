@@ -1,7 +1,7 @@
 {
     "name": "rocket/taxonomy",
     "description": "Taxonomy for your content",
-    "licence": "MIT",
+    "license": "MIT",
     "authors": [
         {
             "name": "Stéphane Goetz",
